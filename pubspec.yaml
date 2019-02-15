@@ -53,6 +53,7 @@ flutter:
     - assets/starGold.png
     - assets/Good_Job.png
     - assets/
+    - assets/animals/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

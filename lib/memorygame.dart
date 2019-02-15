@@ -335,7 +335,7 @@ class CoveredCardTile extends StatelessWidget {
         ),
         BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/$anim.png'),
+            image: AssetImage('assets/animals/$anim.png'),
             alignment: Alignment.bottomCenter,
           ),
         ),
