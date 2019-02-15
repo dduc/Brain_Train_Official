@@ -64,6 +64,7 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
 
   }
 
+
   @override
   void initState(){
     super.initState();
@@ -111,7 +112,7 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
                         )
                     ),
                     child: new Container(
-                      padding: const EdgeInsets.all(40.0),
+                      padding: const EdgeInsets.only(left: 40.0, top: 90, right: 40),
                       child: new Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
