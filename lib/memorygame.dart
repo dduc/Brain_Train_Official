@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:io';
 import 'package:flutter/material.dart';
-//import 'package:fluttertoast/fluttertoast.dart';
 
 enum TileState { covered, flipped, revealed }
 
@@ -44,7 +43,6 @@ class BoardState extends State<Board> {
   int count;
   int totalCards;
   int tapCount = 0;
-
   @override
   void dispose() {
     timer?.cancel();
@@ -62,7 +60,6 @@ class BoardState extends State<Board> {
     timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
       setState(() {});
     });
-
     uiState = new List<List<TileState>>.generate(rows, (row) {
       return new List<TileState>.filled(cols, TileState.covered);
     });
@@ -122,7 +119,6 @@ class BoardState extends State<Board> {
         }
       }
     }
-
     for (int j = 0; j < rows; j++) {
       for (int k = 0; k < cols; k++) {
         print("Tiles[$j][$k]");
@@ -141,6 +137,7 @@ class BoardState extends State<Board> {
 
   Widget buildBoard() {
     List<Row> boardRow = <Row>[];
+
     for (int y = 0; y < rows; y++) {
       List<Widget> rowChildren = <Widget>[];
       for (int x = 0; x < cols; x++) {
@@ -152,10 +149,11 @@ class BoardState extends State<Board> {
             return "Incorrect Match";
           });
         }
+
         TileState state = uiState[y][x];
         rowChildren.add(GestureDetector(
           onTap: () {
-            if ((x == prevX) && (y == prevY)) {
+            if (((x == prevX) && (y == prevY))) {
               if (count == 0) {
                 flipCard(x, y);
               }
@@ -184,6 +182,7 @@ class BoardState extends State<Board> {
 //                  flipCard(prevX, prevY);
                 }
               }
+
               count++;
               if (count == 2) {
                 count = 0;
@@ -216,7 +215,7 @@ class BoardState extends State<Board> {
       ));
     }
     return Container(
-      color: Colors.lightBlueAccent,
+      color: Colors.blue,
       padding: EdgeInsets.all(10.0),
       child: Column(
         children: boardRow,
@@ -278,6 +277,7 @@ class BoardState extends State<Board> {
 
   bool checkMatches(int x, int y, int x2, int y2) {
     if (!onBoard(x, y)) return false;
+    if (x == x2 && y == y2) return false;
     if (animals[y][x] == animals[y2][x2]) {
       print("True");
       print(animals[y][x]);
@@ -317,7 +317,9 @@ class CoveredCardTile extends StatelessWidget {
   final int posX;
   final int posY;
   final String anim;
+
   CoveredCardTile({this.revealed, this.posX, this.posY, this.anim});
+
   @override
   Widget build(BuildContext context) {
     Widget text;
@@ -341,6 +343,7 @@ class CoveredCardTile extends StatelessWidget {
         ),
       );
     }
+
     Widget innerTile = Container(
       padding: EdgeInsets.all(1.0),
       margin: EdgeInsets.all(2.0),
@@ -349,6 +352,7 @@ class CoveredCardTile extends StatelessWidget {
       color: Colors.yellowAccent,
       child: text,
     );
+
     return buildTile(innerTile);
   }
 }
