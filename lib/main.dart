@@ -1,5 +1,9 @@
+//Authors: Kasean and Dirk
+//DB related stuff,button logic,etc: Dirk
+
 import 'package:flutter/material.dart';
 import 'package:brain_train_official/title.dart';
+import 'package:brain_train_official/registration.dart';
 
 // BT API related Imports
 import 'package:http/http.dart' as http;
@@ -77,7 +81,7 @@ List<Teachers> createTeachersList(List data) {
   for (int i = 0; i < data.length; i++) {
 
     Teachers teacher = new Teachers(
-        teacher_id: data[i]["class_id"],
+        teacher_id: data[i]["teacher_id"],
         email: data[i]["email"],
         username: data[i]["username"],
         password: data[i]["password"]);
@@ -181,7 +185,6 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
       }
       else {
         print("Invalid Parent Email and/or Password");
-        return;
       }
     }
   }
@@ -271,13 +274,15 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
     iconAnimationController.forward();
   }
 
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return new Scaffold(
       backgroundColor: Colors.deepOrange,
       //Logic to run loading screen
-      body: loadCircle ? loadingScreen() :
+
+      body:  loadCircle ? loadingScreen() :
       new Stack(
           fit: StackFit.expand,
           children: <Widget>[
@@ -328,43 +333,9 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
                             obscureText: true,
                             controller: passController,
                           ),
-                          new TextFormField(
-                            style: TextStyle(
-                                color: Colors.black
-                            ),
-                            decoration: new InputDecoration(
-                              labelText: "Class Number",
-                            ),
-                            keyboardType: TextInputType.text,
-                            controller: classController,
-                            obscureText: true,
-                          ),
-                          new TextFormField(
-                            style: TextStyle(
-                                color: Colors.black
-                            ),
-                            decoration: new InputDecoration(
-                              labelText: "Age Group",
-                            ),
-                            keyboardType: TextInputType.text,
-                            controller: ageController,
-                            obscureText: true,
-                          ),
                           new Padding(
                               padding: const EdgeInsets.only(
                                   top: 20.0)
-                          ),
-                          new MaterialButton(
-                            color: Colors.blue,
-                            textColor: Colors.white,
-                            child: new Text("Register"),
-                            onPressed: () {
-                              String ema = emailController.text;
-                              String pass = passController.text;
-                              int clas = int.parse(classController.text);
-                              String ag = ageController.text;
-                            },
-                            splashColor: Colors.redAccent,
                           ),
                           new MaterialButton(
                             color: Colors.blue,
@@ -374,7 +345,18 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
                               String em = emailController.text;
                               String pas = passController.text;
 
-                              getAuth(em,pas);
+                              getAuth(em, pas);
+                            },
+                            splashColor: Colors.redAccent,
+                          ),
+                          new MaterialButton(
+                            color: Colors.blue,
+                            textColor: Colors.white,
+                            child: new Text("Register New Account"),
+                            onPressed: () {
+
+                              Navigator.push(context,
+                                MaterialPageRoute(builder: (context) => RegistrationPage()),);
                             },
                             splashColor: Colors.redAccent,
                           ),
