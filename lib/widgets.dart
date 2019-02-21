@@ -7,7 +7,7 @@ import 'package:sensors/sensors.dart';
 class redSquareWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var assetsImage = new AssetImage('assets/tilered01.png');
+    var assetsImage = new AssetImage('assets/shape_matching/tilered01.png');
     var image = new Image(image: assetsImage, width: 48, height: 48);
     return Container(child:image,);
   }
@@ -15,7 +15,7 @@ class redSquareWidget extends StatelessWidget {
 class smallredSquareWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var assetsImage = new AssetImage('assets/tilered01.png');
+    var assetsImage = new AssetImage('assets/shape_matching/tilered01.png');
     var image = new Image(image: assetsImage, width: 24, height: 24,color: Color.fromRGBO(255,0,0,0.5));
     return Container(child:image, );
   }
@@ -24,7 +24,7 @@ class blueSquareWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    var assetsImage = new AssetImage('assets/tileblue01.png');
+    var assetsImage = new AssetImage('assets/shape_matching/tileblue01.png');
     var image = new Image(image: assetsImage, width: 48, height: 48,);
     return Container(child:image);
   }
@@ -33,7 +33,7 @@ class blueSquareWidget extends StatelessWidget {
 class greenTriangleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var assetsImage = new AssetImage('assets/tilegreen07.png');
+    var assetsImage = new AssetImage('assets/shape_matching/tilegreen07.png');
     var image = new Image(image:assetsImage, width: 48, height: 48,);
     return Container(child:image,);
   }
@@ -46,7 +46,7 @@ class AnimationCanvasWidget extends StatelessWidget {
     // TODO: implement build
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    var assetsImage = new AssetImage(('assets/tilered01.png'));
+    var assetsImage = new AssetImage(('assets/shape_matching/tilered01.png'));
     return Container (child: Image(image:assetsImage, width: screenWidth, height: screenHeight,));
   }
 }
@@ -242,7 +242,7 @@ void _showDialog() {
       new Positioned(child: new Transform.rotate(
           angle: currentAngle - pi/2,
           child: new Opacity(opacity: sparklesOpacity,
-              child : new Image.asset("assets/starGold.png", width: 96.0, height: 96.0, ))
+              child : new Image.asset("assets/shape_matching/starGold.png", width: 96.0, height: 96.0, ))
       ),
         //left: pow(sparkleRadius,1.2)*cos(currentAngle) + screenWidth/2,
         //top: (sparkleRadius*sin(currentAngle)) + screenHeight/2,
@@ -363,13 +363,13 @@ void _showDialog() {
           children: <Widget>[
             new Container(
               decoration: new BoxDecoration(
-                image: new DecorationImage(image: new AssetImage("assets/colored_talltrees.png"),fit: BoxFit.cover),
+                image: new DecorationImage(image: new AssetImage("assets/shape_matching/colored_talltrees.png"),fit: BoxFit.cover),
               ),
             ),
             new Positioned(
               left: screenWidth/2 - 264/2,
               top: screenHeight/12,
-              child: Opacity(opacity: textOpacity,  child: Image(image: AssetImage("assets/Good_Job.png")),)
+              child: Opacity(opacity: textOpacity,  child: Image(image: AssetImage("assets/shape_matching/Good_Job.png")),)
             ),
             new Positioned(
               child: new Stack(

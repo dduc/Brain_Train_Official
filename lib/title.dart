@@ -4,6 +4,7 @@ import 'package:flutter/animation.dart';
 import 'dart:math';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:brain_train_official/memorygame.dart';
+import 'package:brain_train_official/balloongame.dart';
 
 //void main() => runApp(MyApp());
 
@@ -55,9 +56,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   int _counter = 0;
-  double _sparklesAngle = 0.0;
-  AnimationController sparklesAnimationController;
-  Animation sparklesAnimation;
 
   var rng;
 
@@ -69,27 +67,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     super.initState();
 
     rng = new Random();
-
-    sparklesAnimationController =
-    new AnimationController(vsync: this, duration: Duration(seconds: 2));
-    sparklesAnimationController.duration = Duration(seconds: 2);
-    sparklesAnimation = new CurvedAnimation(
-        parent: sparklesAnimationController, curve: Curves.easeIn);
-    sparklesAnimation.addListener(() {
-      setState(() {});
-    });
   }
 
     dispose() {
       super.dispose();
-      //scoreInAnimationController.dispose();
-      //scoreOutAnimationController.dispose();
-      sparklesAnimationController.dispose();
     }
 
   void _incrementCounter() {
-
-    sparklesAnimationController.forward(from: 0.0);
 
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -98,8 +82,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
-
-      _sparklesAngle = rng.nextDouble() * (2*pi);
     });
   }
 
@@ -111,38 +93,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    var extraSize = 0.0;
-    var scoreOpacity = 0.0;
-    var scorePosition = 0.0;
-
     var stackChildren = <Widget>[
     ];
-
-    var firstAngle = _sparklesAngle;
-    var sparkleRadius = (sparklesAnimationController.value*10) ;
-    var sparklesOpacity = (1 - sparklesAnimation.value);
-    var _neg = -1;
-    double gravity = 1;
-
-    for(int i = 0;i < 8; ++i) {
-      var currentAngle = (firstAngle + ((2*pi)/5)*(i));
-      var sparklesWidget =
-      new Positioned(child: new Transform.rotate(
-          angle: currentAngle - pi/2,
-          child: new Opacity(opacity: sparklesOpacity,
-              child : new Image.asset("assets/starGold.png", width: 48.0, height: 48.0, ))
-      ),
-        //left: pow(sparkleRadius,1.2)*cos(currentAngle) + screenWidth/2,
-        //top: (sparkleRadius*sin(currentAngle)) + screenHeight/2,
-        left: screenWidth/2 + pow(sparkleRadius,1.4)*_neg*(i+1),
-        top: screenHeight/2.5 - (sparkleRadius*20) - (sparkleRadius*2)*(i+1) + pow(sparkleRadius,2.6),
-      );
-      stackChildren.add(sparklesWidget);
-      gravity *= 3;
-      _neg *= -1;
-    }
-
-    stackChildren.add(new Opacity(opacity: scoreOpacity, child: AnimationCanvasWidget()));
 
     var widget2 =  new Positioned(
         child: new Stack(
@@ -206,6 +158,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             onPressed: () {
               Navigator.push(context,
                 MaterialPageRoute(builder: (context) => draggableImage()),);
+            },),
+        ),
+        new Positioned(
+          top: screenHeight/1.5 - 150/2,
+          left: screenWidth/1.9,
+          child: FlatButton(
+            child: Image.asset("assets/balloon_game_icon.png"),
+            onPressed: () {
+              Navigator.push(context,
+                MaterialPageRoute(builder: (context) => balloongame()),);
             },),
         ),
         /*
