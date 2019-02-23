@@ -2,8 +2,6 @@
 
 the Official brain train
 
-# For Back End Code,  DB Access
-Ask Dirk :)
 
 ## Getting Started
 
