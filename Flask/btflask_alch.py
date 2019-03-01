@@ -16,6 +16,7 @@ from flask import *
 
 # ------ flask imports ------ #
 from flask import Flask, jsonify
+from flask import request
 
 
 # --------- sqlalchemy imports --------- #
@@ -107,8 +108,8 @@ class Parent(db.Model):
 # ********************************************* #
 
 # ALL parents in DB,JSON format
-@app.route('/bt_api/parents', methods=['GET'])
-#if(request.method == 'GET')
+@app.route('/bt_api/parents', methods=['GET','POST'])
+
 def list_all_parents():
 	# isolate a db connection
 	connection = engi.connect().connection
@@ -137,6 +138,21 @@ def list_all_parents():
 		"password": parent[3]
 		}
 		parentList.append(parentDict)
+
+	# Handle POST requests from app
+	if request.method == 'POST':
+
+		#get information sent from Flutter
+		email = request.json['email']
+		password = request.json['password']
+
+		#Insert info w/ query to DB
+		ins_query = "set search_path = \"BT_App_WS\"; INSERT into Parent(email,password) VALUES(\'" + email + "\',\'" + password + "\');"
+
+		#Execute and commit the query
+		cursor.execute(ins_query)
+		connection.commit()
+
 	return jsonify(parentList)
 
 
@@ -202,7 +218,7 @@ class Teacher(db.Model):
 		self.email = email
 		self.password = password
 
-@app.route('/bt_api/teachers', methods=['GET'])
+@app.route('/bt_api/teachers', methods=['GET','POST'])
 def list_all_teachers():
 
 	connection = engi.connect().connection
@@ -222,6 +238,23 @@ def list_all_teachers():
 		"password": teacher[5]
 		}
 		teacherList.append(teacherDict)
+
+	# Handle POST requests from app
+	if request.method == 'POST':
+
+		#get information sent from Flutter
+		email = request.json['email']
+		password = request.json['password']
+		class_num = request.json['class_num']
+		age_group = request.json['age_group']
+
+		#Insert info w/ query to DB
+		ins_query = "set search_path = \"BT_App_WS\"; INSERT into Teacher(email,password,class_num,age_group) VALUES(\'" + email + "\',\'" + password + "\',\'" + class_num + "\',\'" + age_group + "\');"
+
+		#Execute and commit the query
+		cursor.execute(ins_query)
+		connection.commit()
+
 	return jsonify(teacherList)
 
 
@@ -436,5 +469,8 @@ def list_all_player_motor_skillss():
 	return jsonify(playerMotorSkillssList)
 
 # ********** END OF DB OBJECT TABLES ********* #
+
+wsgi_app = app.wsgi_app
+
 if __name__  == '__main__':
-	app.run()
+	app.run(debug=True)
