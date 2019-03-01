@@ -44,26 +44,32 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
       'age_group' : uagegroup
     };
 
+    if(uclass == "" && uagegroup == "") {
+      print("Registered Parent");
+      String pJsonString = json.encode(parentJsonMap);
+      regParent(pJsonString);
+    }
 
-    String pJsonString = json.encode(parentJsonMap);
-    String tJsonString = json.encode(teacherJsonMap);
-
-    regParent(pJsonString);
-    regTeacher(tJsonString);
-  }
-
-  regParent(String pJS) async {
-
-    await http.post('http://172.13.66.158:80/bt_api/parents', body: pJS);
-
-  }
-
-  regTeacher(String tJS) async {
-
-    await http.post('http://172.13.66.158:80/bt_api/teachers', body: tJS);
+    if(uclass != "" && uagegroup != "") {
+      print("Registered Teacher");
+      String tJsonString = json.encode(teacherJsonMap);
+      regTeacher(tJsonString);
+    }
 
   }
 
+  regParent(String pJS) {
+
+    //print(pJS);
+    http.post('http://172.13.66.158:80/bt_api/parents',headers: {"Content-Type":"application/json"}, body: pJS).then((response) {print("Response status: ${response.statusCode}"); print("Response body: ${response.body}");});
+
+  }
+
+  regTeacher(String tJS) {
+
+    http.post('http://172.13.66.158:80/bt_api/teachers',headers: {"Content-Type":"application/json"}, body: tJS).then((response) {print("Response status: ${response.statusCode}"); print("Response body: ${response.body}");});
+
+  }
 
   @override
   void initState(){
@@ -146,7 +152,7 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
                             ),
                             keyboardType: TextInputType.text,
                             controller: classController,
-                            obscureText: true,
+                            obscureText: false,
                           ),
                           new TextFormField(
                             style: TextStyle(
@@ -157,7 +163,7 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
                             ),
                             keyboardType: TextInputType.text,
                             controller: ageController,
-                            obscureText: true,
+                            obscureText: false,
                           ),
                           new Padding(
                               padding: const EdgeInsets.only(

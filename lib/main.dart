@@ -66,12 +66,16 @@ class Teachers {
   final String email;
   final String password;
   final String username;
+  final int class_num;
+  final String age_group;
 
   Teachers({
     this.teacher_id,
     this.email,
     this.password,
-    this.username
+    this.username,
+    this.class_num,
+    this.age_group
   });
 }
 
@@ -84,7 +88,9 @@ List<Teachers> createTeachersList(List data) {
         teacher_id: data[i]["teacher_id"],
         email: data[i]["email"],
         username: data[i]["username"],
-        password: data[i]["password"]);
+        password: data[i]["password"],
+        age_group: data[i]["age_group"],
+        class_num: data[i]["class_num"]);
     list.add(teacher);
   }
   return list;
@@ -200,6 +206,7 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
     }
 
     //Testing purposes below
+
     /*
     print(telist);
     print(tplist);
@@ -210,11 +217,12 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
     for(int i = 0; i < telist.length; i++) {
       if(te == telist[i] && tp == tplist[i]) {
         print("Valid Teacher Email and Password");
+        Navigator.push(context,
+          MaterialPageRoute(builder: (context) => MyHomePage(title: 'Shape matching game')),);
         return;
       }
       else {
         print("Invalid Teacher Email and/or Password");
-        return;
       }
     }
   }
