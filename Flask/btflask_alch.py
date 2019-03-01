@@ -6,7 +6,7 @@
 #		   between Flutter and PostgreSQL database. This program is essentially
 #          the Web API for mobile application BrainTrain
 #
-# Modified: 1-19-19
+# Last Modified: 2-28-19
 
 # --------- python imports -------- #
 import psycopg2

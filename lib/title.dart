@@ -6,6 +6,9 @@ import 'package:audioplayers/audio_cache.dart';
 import 'package:brain_train_official/memorygame.dart';
 import 'package:brain_train_official/balloongame.dart';
 
+//get login info
+import 'package:brain_train_official/main.dart' as login;
+
 //void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -125,9 +128,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       //child: new redSquareWidget()
       children: <Widget>[
         //new Center(
-          //child: new Text("Hello background"),
-       //   child: draggableImage(),
-       // )
+        //  child: new Text("Hello background"),
+        //new Center(child: new Text("Welcome " + login.MyApp.email, textAlign: TextAlign.left, textScaleFactor: 2,)),
+        //),
         //widget2,
         //draggableImage(),
         new Container(
@@ -136,9 +139,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           ),
         ),
         new Positioned(
-          top: screenHeight/14,
+          top: screenHeight/10,
           left: screenWidth/3.5,
           child: Image.asset("assets/Brain_train_title.png"),
+        ),
+        // Welcome message for user
+        // Note to Kasean: feel free to make this all look like
+        // you want I just needed it for DB queries for the games
+        // so I made it as generic as possible, also doesn't scale
+        // with screen
+        // - Dirk
+        new Positioned(
+          top: screenHeight/20,
+          left: screenWidth/12,
+          child: new Text("Welcome " + login.MyApp.email, textAlign: TextAlign.left, textScaleFactor: 2,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
         ),
         new Positioned(
           top: screenHeight/2.5 - 150/2,

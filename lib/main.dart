@@ -19,6 +19,8 @@ class MyApp extends StatelessWidget {
   final Future<Teachers> teachers;
   MyApp({Key key, this.parents,this.teachers}) : super(key:key);
 
+  //email for welcome on title page
+  static String email;
 
   @override
 
@@ -109,6 +111,7 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
   //Dirk's LoginPageState code
   bool loadCircle = false;
   int r = 1;
+  bool loggedIn = false;
 
   final passController = TextEditingController();
   final emailController = TextEditingController();
@@ -185,6 +188,8 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
     for(int i = 0; i < pelist.length; i++) {
       if(pe == pelist[i] && pp == pplist[i]) {
         print("Valid Parent Email and Password");
+        loggedIn = true;
+        MyApp.email = pe;
         Navigator.push(context,
           MaterialPageRoute(builder: (context) => MyHomePage(title: 'Shape matching game')),);
         return;
@@ -217,6 +222,8 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
     for(int i = 0; i < telist.length; i++) {
       if(te == telist[i] && tp == tplist[i]) {
         print("Valid Teacher Email and Password");
+        loggedIn = true;
+        MyApp.email = te;
         Navigator.push(context,
           MaterialPageRoute(builder: (context) => MyHomePage(title: 'Shape matching game')),);
         return;
