@@ -38,6 +38,8 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
 
   }
 
+  var lastnum = 0;
+
   @override
   Widget build(BuildContext context) {
 
@@ -50,6 +52,108 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+
+    var balloonChildren = <Widget>[
+    ];
+    double topvalue, leftvalue;
+
+    var rng = new Random();
+    var num = rng.nextInt(5);
+
+    while (num == lastnum)
+    {
+      num = rng.nextInt(5);
+    }
+    lastnum = num;
+
+    var correctcount = num+1;
+
+    double offsetvalue = 1;
+    double offsetvalue2 = 1;
+    if(num == 1)
+      {
+        offsetvalue = 1.5;
+      }
+    if(num == 3)
+      {
+        offsetvalue2 = .75;
+      }
+
+    for(int i = 0; i < num + 1; ++i)
+    {
+      //set positions of balloons
+      if(i == 0)
+        {
+          topvalue = screenHeight/2 - 125/2;
+          leftvalue = screenWidth/2*offsetvalue - 59/2;
+        }
+      if(i == 1)
+        {
+          topvalue = screenHeight/2 - 125/2;
+          leftvalue = screenWidth/6*offsetvalue - 59/2;
+        }
+      if(i == 2)
+        {
+          topvalue = screenHeight/2 - 125/2;
+          leftvalue = screenWidth/1.2 - 59/2;
+        }
+      if(i == 3)
+        {
+          topvalue = screenHeight/4 - 125/2;
+          leftvalue = screenWidth/1.5*offsetvalue2 - 59/2;
+        }
+      if(i == 4)
+        {
+          topvalue = screenHeight/4 - 125/2;
+          leftvalue = screenWidth/3 - 59/2;
+        }
+
+      //create balloons
+      var balloon = new Positioned(
+          top: topvalue,
+          left: leftvalue,
+          child: Image.asset("assets/balloon_game/red_balloon.png"),
+        );
+      balloonChildren.add(balloon);
+    }
+
+    var string1 = "assets/balloon_game/number1.png";
+    var string2 = "assets/balloon_game/number2.png";
+    var string3 = "assets/balloon_game/number3.png";
+
+    var rng2 = new Random();
+    var num2 = rng2.nextInt(3);
+
+    var incorrectnum1 = rng2.nextInt(5) + 1;
+    while(incorrectnum1 == correctcount)
+    {
+      incorrectnum1 = rng2.nextInt(5) + 1;
+    }
+    var incorrectnum2 = rng2.nextInt(5) + 1;
+    while(incorrectnum2 == correctcount || incorrectnum2 == incorrectnum1)
+    {
+      incorrectnum2 = rng2.nextInt(5) + 1;
+    }
+
+    if(num2 == 0)
+    {
+      string1 = "assets/balloon_game/number$correctcount.png";
+      string2 = "assets/balloon_game/number$incorrectnum1.png";
+      string3 = "assets/balloon_game/number$incorrectnum2.png";
+    }
+    else if(num2 == 1)
+    {
+      string2 = "assets/balloon_game/number$correctcount.png";
+      string1 = "assets/balloon_game/number$incorrectnum1.png";
+      string3 = "assets/balloon_game/number$incorrectnum2.png";
+    }
+    else if (num2 == 2)
+    {
+      string3 = "assets/balloon_game/number$correctcount.png";
+      string2 = "assets/balloon_game/number$incorrectnum1.png";
+      string1 = "assets/balloon_game/number$incorrectnum2.png";
+    }
+
     return Scaffold(
       //appBar: AppBar(
       // Here we take the value from the MyHomePage object that was created by
@@ -67,32 +171,56 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
             ),
           ),
           new Positioned(
-            top: screenHeight/2 - 125/2,
-            left: screenWidth/2 - 59/2,
-            child: Image.asset("assets/balloon_game/red_balloon.png"),
+            child: new Stack(
+              //alignment: FractionalOffset.center,
+              //overflow: Overflow.visible,
+              children: balloonChildren,
+            ),
           ),
+          //new Positioned(
+          //  top: screenHeight/2 - 125/2,
+          //  left: screenWidth/2 - 59/2,
+          //  child: Image.asset("assets/balloon_game/red_balloon.png"),
+          //),
           new Positioned(
             top: screenHeight/1.1 - 76/2,
             left: screenWidth/10 - 37/2,
             child: FlatButton(
-              child: Image.asset("assets/balloon_game/number1.png"),
+              child: Image.asset(string1),
               onPressed: () {
+                if(num2 == 0)
+                {
+                  setState(() {
+
+                  });
+                }
               },),
           ),
           new Positioned(
             top: screenHeight/1.1 - 76/2,
             left: screenWidth/2.25 - 37/2,
             child: FlatButton(
-              child: Image.asset("assets/balloon_game/number2.png"),
+              child: Image.asset(string2),
               onPressed: () {
+                if(num2 == 1)
+                {
+                  setState(() {
+
+                  });
+                }
               },),
           ),
           new Positioned(
             top: screenHeight/1.1 - 76/2,
             left: screenWidth/1.3 - 37/2,
             child: FlatButton(
-              child: Image.asset("assets/balloon_game/number3.png"),
+              child: Image.asset(string3),
               onPressed: () {
+                if(num2 == 2) {
+                  setState(() {
+                    //num = nextInt(5);
+                  });
+                }
               },),
           ),
         ],
