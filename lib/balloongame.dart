@@ -22,23 +22,63 @@ class balloongame extends StatefulWidget {
   _BalloonGameState createState() => _BalloonGameState();
 }
 
+class AnimationCanvasWidget extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    var assetsImage = new AssetImage(('assets/shape_matching/tilered01.png'));
+    return Container (child: Image(image:assetsImage, width: screenWidth, height: screenHeight,));
+  }
+}
+
 
 class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin {
   //add variables
+  AnimationController sparklesAnimationController;
+  Animation sparklesAnimation;
+
+  double sparklesOpacity = 0;
+  double textOpacity = 0;
+  bool animationInit = true;
 
   initState() {
     super.initState();
+
+    sparklesAnimationController =
+    new AnimationController(vsync: this, duration: Duration(seconds: 4));
+    sparklesAnimationController.duration = Duration(seconds: 4);
+    sparklesAnimation = new CurvedAnimation(
+        parent: sparklesAnimationController, curve: Curves.easeIn);
+    sparklesAnimation.addListener(() {
+      setState(() {});
+    });
   }
 
   dispose() {
     super.dispose();
+    sparklesAnimationController.dispose();
   }
 
   void _incrementCounter() {
 
   }
 
+  //game variables that should not change with set State.
+
   var lastnum = 0;
+
+  var rng = new Random();
+  var num = 1;
+  var correctcount = 2;
+
+  var rng2 = new Random();
+  var num2 = 2;
+
+  var incorrectnum1 = 3;
+  var incorrectnum2 = 4;
 
   @override
   Widget build(BuildContext context) {
@@ -56,17 +96,6 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
     var balloonChildren = <Widget>[
     ];
     double topvalue, leftvalue;
-
-    var rng = new Random();
-    var num = rng.nextInt(5);
-
-    while (num == lastnum)
-    {
-      num = rng.nextInt(5);
-    }
-    lastnum = num;
-
-    var correctcount = num+1;
 
     double offsetvalue = 1;
     double offsetvalue2 = 1;
@@ -121,19 +150,6 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
     var string2 = "assets/balloon_game/number2.png";
     var string3 = "assets/balloon_game/number3.png";
 
-    var rng2 = new Random();
-    var num2 = rng2.nextInt(3);
-
-    var incorrectnum1 = rng2.nextInt(5) + 1;
-    while(incorrectnum1 == correctcount)
-    {
-      incorrectnum1 = rng2.nextInt(5) + 1;
-    }
-    var incorrectnum2 = rng2.nextInt(5) + 1;
-    while(incorrectnum2 == correctcount || incorrectnum2 == incorrectnum1)
-    {
-      incorrectnum2 = rng2.nextInt(5) + 1;
-    }
 
     if(num2 == 0)
     {
@@ -154,6 +170,53 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
       string1 = "assets/balloon_game/number$incorrectnum2.png";
     }
 
+    //Animation
+    var stackChildren = <Widget>[
+    ];
+
+    double _sparklesAngle = 0.0;
+
+    var confettinum = 1;
+    var _neg = -1;
+
+    var firstAngle = _sparklesAngle;
+    var sparkleRadius = (sparklesAnimationController.value*10) ;
+    sparklesOpacity = (1 - sparklesAnimation.value);
+    if(animationInit == true)
+    {
+      sparklesOpacity = 0;
+    }
+    
+    if(sparklesAnimation.value < 1 && animationInit != true)
+    {
+      textOpacity = 1;
+    }
+    else
+    {
+      textOpacity = 0;
+    }
+
+    for(int i = 0;i < 20; ++i) {
+      var currentAngle = (firstAngle + ((2*pi)/5)*(i));
+      var sparklesWidget =
+      new Positioned(child: new Transform.rotate(
+          angle: currentAngle - pi/2,
+          child: new Opacity(opacity: sparklesOpacity,
+              child : new Image.asset("assets/balloon_game/confetti$confettinum.png", width: 96.0, height: 96.0, ))
+      ),
+        //left: pow(sparkleRadius,1.2)*cos(currentAngle) + screenWidth/2,
+        //top: (sparkleRadius*sin(currentAngle)) + screenHeight/2,
+        left: screenWidth - (i+1)*(screenWidth/20) - 30,
+        top: screenHeight - screenHeight*sparklesOpacity + 25*(i%8)*_neg,
+      );
+      confettinum++;
+      _neg *= -1;
+      if(confettinum >= 5) {
+        confettinum = 1;
+      }
+      stackChildren.add(sparklesWidget);
+    }
+
     return Scaffold(
       //appBar: AppBar(
       // Here we take the value from the MyHomePage object that was created by
@@ -171,11 +234,27 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
             ),
           ),
           new Positioned(
+              left: screenWidth/2 - 264/2,
+              top: screenHeight/12,
+              child: Opacity(opacity: textOpacity,  child: Image(image: AssetImage("assets/shape_matching/Good_Job.png")),)
+          ),
+          new Positioned(
             child: new Stack(
               //alignment: FractionalOffset.center,
               //overflow: Overflow.visible,
               children: balloonChildren,
             ),
+          ),
+          new Positioned(
+            child: new Stack(
+              //alignment: FractionalOffset.center,
+              //overflow: Overflow.visible,
+              children: stackChildren,
+            )
+            ,
+            //left: screenWidth/2,
+            //top: screenHeight/2,
+            //bottom: 50
           ),
           //new Positioned(
           //  top: screenHeight/2 - 125/2,
@@ -190,8 +269,33 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
               onPressed: () {
                 if(num2 == 0)
                 {
-                  setState(() {
+                  animationInit = false;
+                  sparklesAnimationController.forward(from: 0.0);
+                  var rng = new Random();
+                  num = rng.nextInt(5);
 
+                  while (num == lastnum)
+                  {
+                    num = rng.nextInt(5);
+                  }
+                  lastnum = num;
+                  correctcount = num+1;
+
+                  rng2 = new Random();
+                  num2 = rng2.nextInt(3);
+
+                  incorrectnum1 = rng2.nextInt(5) + 1;
+                  while(incorrectnum1 == correctcount)
+                  {
+                    incorrectnum1 = rng2.nextInt(5) + 1;
+                  }
+                  incorrectnum2 = rng2.nextInt(5) + 1;
+                  while(incorrectnum2 == correctcount || incorrectnum2 == incorrectnum1)
+                  {
+                    incorrectnum2 = rng2.nextInt(5) + 1;
+                  }
+
+                  setState(() {
                   });
                 }
               },),
@@ -204,8 +308,34 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
               onPressed: () {
                 if(num2 == 1)
                 {
-                  setState(() {
+                  animationInit = false;
+                  sparklesAnimationController.forward(from: 0.0);
+                  var rng = new Random();
+                  num = rng.nextInt(5);
 
+                  while (num == lastnum)
+                  {
+                    num = rng.nextInt(5);
+                  }
+                  lastnum = num;
+
+                  correctcount = num+1;
+
+                  rng2 = new Random();
+                  num2 = rng2.nextInt(3);
+
+                  incorrectnum1 = rng2.nextInt(5) + 1;
+                  while(incorrectnum1 == correctcount)
+                  {
+                    incorrectnum1 = rng2.nextInt(5) + 1;
+                  }
+                  incorrectnum2 = rng2.nextInt(5) + 1;
+                  while(incorrectnum2 == correctcount || incorrectnum2 == incorrectnum1)
+                  {
+                    incorrectnum2 = rng2.nextInt(5) + 1;
+                  }
+
+                  setState(() {
                   });
                 }
               },),
@@ -217,6 +347,33 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
               child: Image.asset(string3),
               onPressed: () {
                 if(num2 == 2) {
+                  animationInit = false;
+                  sparklesAnimationController.forward(from: 0.0);
+
+                  var rng = new Random();
+                  num = rng.nextInt(5);
+
+                  while (num == lastnum)
+                  {
+                    num = rng.nextInt(5);
+                  }
+                  lastnum = num;
+                  correctcount = num+1;
+
+                  rng2 = new Random();
+                  num2 = rng2.nextInt(3);
+
+                  incorrectnum1 = rng2.nextInt(5) + 1;
+                  while(incorrectnum1 == correctcount)
+                  {
+                    incorrectnum1 = rng2.nextInt(5) + 1;
+                  }
+                  incorrectnum2 = rng2.nextInt(5) + 1;
+                  while(incorrectnum2 == correctcount || incorrectnum2 == incorrectnum1)
+                  {
+                    incorrectnum2 = rng2.nextInt(5) + 1;
+                  }
+
                   setState(() {
                     //num = nextInt(5);
                   });
