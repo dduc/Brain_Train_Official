@@ -122,7 +122,7 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
   Future<List<Parents>> getParents() async
   {
     loading();
-    final resp = await http.get('http://172.13.66.158/bt_api/parents');
+    final resp = await http.get('http://braintrainapi.com/bt_api/parents');
     //If http.get is successful
     if (resp.statusCode == 200) {
       print("Request #$r");
@@ -142,7 +142,7 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
   Future<List<Teachers>> getTeachers() async
   {
     loading();
-    final resp = await http.get('http://172.13.66.158:80/bt_api/teachers');
+    final resp = await http.get('http://braintrainapi.com/bt_api/teachers');
     //If http.get is successful
     if (resp.statusCode == 200) {
       print("Request #$r");

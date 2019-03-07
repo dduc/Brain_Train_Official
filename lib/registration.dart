@@ -60,13 +60,13 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
   regParent(String pJS) {
 
     //print(pJS);
-    http.post('http://172.13.66.158:80/bt_api/parents',headers: {"Content-Type":"application/json"}, body: pJS).then((response) {print("Response status: ${response.statusCode}"); print("Response body: ${response.body}");});
+    http.post('http://braintrainapi.com/bt_api/parents',headers: {"Content-Type":"application/json"}, body: pJS).then((response) {print("Response status: ${response.statusCode}"); print("Response body: ${response.body}");});
 
   }
 
   regTeacher(String tJS) {
 
-    http.post('http://172.13.66.158:80/bt_api/teachers',headers: {"Content-Type":"application/json"}, body: tJS).then((response) {print("Response status: ${response.statusCode}"); print("Response body: ${response.body}");});
+    http.post('http://braintrainapi.com/bt_api/teachers',headers: {"Content-Type":"application/json"}, body: tJS).then((response) {print("Response status: ${response.statusCode}"); print("Response body: ${response.body}");});
 
   }
 
