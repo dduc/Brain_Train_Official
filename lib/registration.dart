@@ -1,11 +1,14 @@
 //Authors: Kasean and Dirk
-//DB related stuff,button logic,etc: Dirk
+//DB related stuff,button logic,design,etc: Dirk
 
 import 'package:flutter/material.dart';
 
 // BT API related Imports
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+//reg related checks
+import 'package:brain_train_official/main.dart' as checkDB;
 
   @override
 
@@ -44,30 +47,85 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
     };
 
     if(uclass == "" && uagegroup == "") {
-      print("Registered Parent");
+      print("Registering Parent...");
       String pJsonString = json.encode(parentJsonMap);
       regParent(pJsonString);
     }
 
     if(uclass != "" && uagegroup != "") {
-      print("Registered Teacher");
+      print("Registering Teacher...");
       String tJsonString = json.encode(teacherJsonMap);
       regTeacher(tJsonString);
     }
 
   }
 
-  regParent(String pJS) {
+  void regParent(String pJS) async {
+    int r = 1;
+    final resp = await http.get('https://braintrainapi.com/btapi/parents');
+    //If http.get is successful
+    if (resp.statusCode == 200) {
+      print("Request #$r");
+      r++;
+      print("Successful connection to BT API");
+      List btjson = json.decode(resp.body.toString());
+      List<checkDB.Parents> parsList = checkDB.createParentsList(btjson);
+      var tot_par = parsList.length;
 
-    //print(pJS);
-    http.post('http://braintrainapi.com/bt_api/parents',headers: {"Content-Type":"application/json"}, body: pJS).then((response) {print("Response status: ${response.statusCode}"); print("Response body: ${response.body}");});
+      Map decoded = jsonDecode(pJS);
+      for (int i = 0; i < tot_par; i++) {
+        //print(parsList[i].email);
+        //print(decoded["email"]);
+        if(parsList[i].email == decoded["email"]) {
+          print("Parent email already exists,registration incomplete");
+          return;
+        }
+      }
 
+      //print(pJS);
+      http.post('https://braintrainapi.com/btapi/parents',
+          headers: {"Content-Type": "application/json"}, body: pJS).then((
+          response) {
+        //print("Response status: ${response.statusCode}");
+        //print("Response body: ${response.body}");
+        print("Registration Complete");
+      });
+    }
+    else
+      print("Unsuccessful connection to BT API, please contact web server admin");
   }
 
-  regTeacher(String tJS) {
+  void regTeacher(String tJS) async {
+    int r = 1;
+    final resp = await http.get('https://braintrainapi.com/btapi/teachers');
+    //If http.get is successful
+    if (resp.statusCode == 200) {
+      print("Request #$r");
+      r++;
+      print("Successful connection to BT API");
+      List btjson = json.decode(resp.body.toString());
+      List<checkDB.Teachers> teachersList = checkDB.createTeachersList(btjson);
+      var tot_par = teachersList.length;
 
-    http.post('http://braintrainapi.com/bt_api/teachers',headers: {"Content-Type":"application/json"}, body: tJS).then((response) {print("Response status: ${response.statusCode}"); print("Response body: ${response.body}");});
+      Map decoded = jsonDecode(tJS);
+      for (int i = 0; i < tot_par; i++) {
+        //print(parsList[i].email);
+        //print(decoded["email"]);
+        if (teachersList[i].email == decoded["email"]) {
+          print("Teacher email already exists,registration incomplete");
+          return;
+        }
+      }
 
+      http.post('https://braintrainapi.com/btapi/teachers',
+          headers: {"Content-Type": "application/json"}, body: tJS).then
+        ((response) {
+        print("Response status: ${response.statusCode}");
+        print("Response body: ${response.body}");
+      });
+    }
+    else
+      print("Unsuccessful connection to BT API, please contact web server admin");
   }
 
   @override

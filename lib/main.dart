@@ -1,5 +1,5 @@
 //Authors: Kasean and Dirk
-//DB related stuff,button logic,etc: Dirk
+//DB related stuff,button logic,design,etc: Dirk
 
 import 'package:flutter/material.dart';
 import 'package:brain_train_official/title.dart';
@@ -55,7 +55,7 @@ List<Parents> createParentsList(List data) {
     Parents parent = new Parents(
         parent_id: data[i]["parent_id"],
         email: data[i]["email"],
-        username: data[i]["username"],
+        //username: data[i]["username"],
         password: data[i]["password"]);
     list.add(parent);
   }
@@ -122,7 +122,7 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
   Future<List<Parents>> getParents() async
   {
     loading();
-    final resp = await http.get('http://braintrainapi.com/bt_api/parents');
+    final resp = await http.get('https://braintrainapi.com/btapi/parents');
     //If http.get is successful
     if (resp.statusCode == 200) {
       print("Request #$r");
@@ -138,11 +138,10 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
     }
   }
 
-  //get the parent response from the BT REST API
-  Future<List<Teachers>> getTeachers() async
+    Future<List<Teachers>> getTeachers() async
   {
     loading();
-    final resp = await http.get('http://braintrainapi.com/bt_api/teachers');
+    final resp = await http.get('https://braintrainapi.com/btapi/teachers');
     //If http.get is successful
     if (resp.statusCode == 200) {
       print("Request #$r");
@@ -159,6 +158,7 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
   }
 
   void getAuth(String email, String pass) async {
+
     final parent = await getParents();
     final teacher = await getTeachers();
 
@@ -334,7 +334,7 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
                             decoration: new InputDecoration(
                               labelText: "Enter Email",
                             ),
-                            keyboardType: TextInputType.emailAddress,
+                            keyboardType: TextInputType.text,
                             controller: emailController,
                           ),
                           new TextFormField(
