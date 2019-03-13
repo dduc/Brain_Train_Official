@@ -186,7 +186,7 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
     {
       sparklesOpacity = 0;
     }
-    
+
     if(sparklesAnimation.value < 1 && animationInit != true)
     {
       textOpacity = 1;

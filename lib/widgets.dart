@@ -382,6 +382,62 @@ void _showDialog() {
               //top: screenHeight/2,
               //bottom: 50
             ),
+            new Positioned(left: screenWidth/2 - 100/2,
+              top: 400,
+              width: 100,
+              height: 100,
+              child: DragTarget(
+                builder:(
+                    context,
+                    accepted,
+                    rejected,
+                    ) => Opacity(child: target,opacity: 0.5),
+                //Container(
+                //width: 100,
+                //height: 100,
+                //color: Colors.amberAccent,
+                //child: Center(child: Text(acceptedData.toString())),
+                //),
+                onWillAccept: (data) {
+                  return true;
+                },
+                onAccept: (String data) {
+                  acceptedData = data;
+                  if(data == answerData) {
+                    animationInit = false;
+                    sparklesAnimationController.forward(from: 0.0);
+
+                    player.play(correctAudioPath);
+                    //Scaffold.of(context).showSnackBar(SnackBar(content: Text("good job!!")));
+
+                    var rng = new Random();
+                    var num = rng.nextInt(3);
+
+                    while (num == lastNum)
+                    {
+                      num = rng.nextInt(3);
+                    }
+
+                    if(num == 1) {
+                      answerData = "green";
+                      target = greenTriangleWidget();
+                    }
+                    else if(num == 2) {
+                      answerData = "blue";
+                      target = blueSquareWidget();
+                    }
+                    else {
+                      answerData = "red";
+                      target = redSquareWidget();
+                    }
+                    lastNum = num;
+                    //target = test2;
+                  }
+                  else {
+                    //Scaffold.of(context).showSnackBar(SnackBar(content: Text("try again.")));
+                  }
+                },
+              ),),
             new Positioned(
               left: widget.offset1.dx,
                 top: widget.offset1.dy - widget.height + 20,
@@ -390,7 +446,7 @@ void _showDialog() {
                   child: box, feedback: box,
               childWhenDragging: new Opacity(opacity: 0.0, child: box),
               onDraggableCanceled: (v,o) {
-                    setState(() { widget.offset1 = Offset(o.dx, o.dy + widget.height - 20);});
+                    //setState(() { widget.offset1 = Offset(o.dx, o.dy + widget.height - 20);});
               },
               ),
             ),
@@ -404,7 +460,7 @@ void _showDialog() {
                 child: box2, feedback: box2,
                 childWhenDragging: new Opacity(opacity: 0.0, child: box2),
                 onDraggableCanceled: (v,o) {
-                  setState(() => widget.offset2 = Offset(o.dx, o.dy + widget.height - 20));
+                  //setState(() => widget.offset2 = Offset(o.dx, o.dy + widget.height - 20));
                 },
               ),
             ),
@@ -418,66 +474,10 @@ void _showDialog() {
                 child: box3, feedback: box3,
                 childWhenDragging: new Opacity(opacity: 0.0, child: box3),
                 onDraggableCanceled: (v,o) {
-                  setState(() => widget.offset3 = Offset(o.dx, o.dy + widget.height - 20));
+                  //setState(() => widget.offset3 = Offset(o.dx, o.dy + widget.height - 20));
                 },
               ),
             ),
-          new Positioned(left: screenWidth/2 - 100/2,
-          top: 400,
-          width: 100,
-          height: 100,
-          child: DragTarget(
-            builder:(
-                context,
-                accepted,
-                rejected,
-                ) => Opacity(child: target,opacity: 0.5),
-            //Container(
-            //width: 100,
-            //height: 100,
-            //color: Colors.amberAccent,
-            //child: Center(child: Text(acceptedData.toString())),
-            //),
-            onWillAccept: (data) {
-              return true;
-            },
-            onAccept: (String data) {
-              acceptedData = data;
-              if(data == answerData) {
-                animationInit = false;
-                sparklesAnimationController.forward(from: 0.0);
-
-                player.play(correctAudioPath);
-                //Scaffold.of(context).showSnackBar(SnackBar(content: Text("good job!!")));
-
-                var rng = new Random();
-                var num = rng.nextInt(3);
-
-                while (num == lastNum)
-                  {
-                    num = rng.nextInt(3);
-                  }
-
-                if(num == 1) {
-                  answerData = "green";
-                  target = greenTriangleWidget();
-                }
-                else if(num == 2) {
-                  answerData = "blue";
-                  target = blueSquareWidget();
-                }
-                else {
-                  answerData = "red";
-                  target = redSquareWidget();
-                }
-                lastNum = num;
-                  //target = test2;
-              }
-              else {
-                //Scaffold.of(context).showSnackBar(SnackBar(content: Text("try again.")));
-              }
-            },
-          ),),
           ],
         ),
       ),
