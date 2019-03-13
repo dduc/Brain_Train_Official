@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:brain_train_official/memorygame.dart';
 import 'package:brain_train_official/balloongame.dart';
+import 'package:brain_train_official/thisOrThat.dart';
 
 //get login info
 import 'package:brain_train_official/main.dart' as login;
@@ -182,6 +183,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             onPressed: () {
               Navigator.push(context,
                 MaterialPageRoute(builder: (context) => balloongame()),);
+            },),
+        ),
+        new Positioned(
+          top: screenHeight/1.5 - 150/2,
+          left: screenWidth/12,
+          child: FlatButton(
+            child: Image.asset("assets/this_or_that.jpg"),
+            onPressed: () {
+              Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ThisOrThat()),);
             },),
         ),
         /*
