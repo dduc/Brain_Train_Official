@@ -9,6 +9,10 @@ import 'package:brain_train_official/registration.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
+
+//DB imports
+import 'package:postgres/postgres.dart' as pg;
 
 void main() => runApp(new MyApp());
 
@@ -55,7 +59,7 @@ List<Parents> createParentsList(List data) {
     Parents parent = new Parents(
         parent_id: data[i]["parent_id"],
         email: data[i]["email"],
-        //username: data[i]["username"],
+        username: data[i]["username"],
         password: data[i]["password"]);
     list.add(parent);
   }
@@ -157,6 +161,27 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
     }
   }
 
+  /*
+  Future<String> checkPS(String pe) async {
+    var connection = new pg.PostgreSQLConnection("braintrainapi.com",5432,"BrainTrain_App_WS", username: "postgres", password: "Gka\$&@45!?hal");
+    await connection.open();
+    List<dynamic> pid = await connection.query(
+        "SELECT parent_id from \"BT_App_WS\".parent where email = '" + pe + "';");
+    print(pid);
+    int pD = int.parse(pid.toString());
+
+    List<Parents> plist = await getParents();
+    for(int i = 0; i < plist.length;i++) {
+      if(plist[i].parent_id == pD) {
+        List<dynamic> salt = await connection.query(
+            "set search_path = \"BT_App_WS\"; SELECT Parent_id from s_parent where Parent_id = " + plist[i].parent_id.toString() + ";");
+        print(salt.toString());
+        return salt.toString();
+      }
+    }
+  }
+  */
+
   void getAuth(String email, String pass) async {
 
     final parent = await getParents();
@@ -172,6 +197,7 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
 
     List<String> pelist = new List();
     List<String> pplist = new List();
+
     for(int i = 0; i < tot_par; i++) {
       pelist.add(parentJsonData[i].email);
       pplist.add(parentJsonData[i].password);
@@ -183,6 +209,16 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
     print(pplist);
     print(pe);
     print(pp);
+    */
+
+    //encode,hash,and salt pass for comparison
+    //Future<String> ps = checkPS(pe);
+    //print(ps);
+
+    /*
+    var pPass = utf8.encode(pp);
+    var pHash = sha256.convert(pPass);
+    pp = pHash.toString();
     */
 
     for(int i = 0; i < pelist.length; i++) {
@@ -218,6 +254,11 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
     print(te);
     print(tp);
     */
+
+    //encode,hash,and salt pass for comparison
+    var tPass = utf8.encode(tp);
+    var tHash = sha256.convert(tPass);
+    tp = tHash.toString();
 
     for(int i = 0; i < telist.length; i++) {
       if(te == telist[i] && tp == tplist[i]) {

@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 // BT API related Imports
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'package:random_string/random_string.dart' as rnd;
 
 //reg related checks
 import 'package:brain_train_official/main.dart' as checkDB;
@@ -38,12 +40,17 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
     Map<String,dynamic> parentJsonMap = {
       'email' : uemail,
       'password' : upass,
+      'salt': "",
+      'Parent_id':""
     };
+
     Map<String,dynamic> teacherJsonMap = {
       'email' : uemail,
       'password' : upass,
       'class_num' : uclass,
-      'age_group' : uagegroup
+      'age_group' : uagegroup,
+      'salt': "",
+      'Teacher_id': ""
     };
 
     if(uclass == "" && uagegroup == "") {
@@ -72,24 +79,79 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
       List<checkDB.Parents> parsList = checkDB.createParentsList(btjson);
       var tot_par = parsList.length;
 
+      //Registration logic
       Map decoded = jsonDecode(pJS);
       for (int i = 0; i < tot_par; i++) {
-        //print(parsList[i].email);
-        //print(decoded["email"]);
-        if(parsList[i].email == decoded["email"]) {
+        if (parsList[i].email == decoded["email"]) {
           print("Parent email already exists,registration incomplete");
           return;
         }
       }
 
+      //BELOW: hash and salt logic for insertion to DB
+      int pid;
+      String pSalt;
+
+      //salt creation
+      pSalt = rnd.randomAlphaNumeric(32);
+      decoded["salt"] = pSalt;
+
+      //Hashing function: SHA 256 + 32 byte salt, will make more robust in future
+      var pPass = utf8.encode(decoded["password"] + pSalt);
+      var pHash = sha256.convert(pPass);
+
+      //Prepare hash for POST
+      decoded["password"] = pHash.toString();
+      pJS = json.encode(decoded);
+
       //print(pJS);
+      //register user with hashed pass
       http.post('https://braintrainapi.com/btapi/parents',
           headers: {"Content-Type": "application/json"}, body: pJS).then((
           response) {
         //print("Response status: ${response.statusCode}");
         //print("Response body: ${response.body}");
         print("Registration Complete");
+        //Store salt related to parent w/ function
+        print("storing salt...");
+        parSalt(decoded, decoded["email"], pid);
       });
+    }
+    else
+      print(
+          "Unsuccessful connection to BT API, please contact web server admin");
+  }
+
+  void parSalt(Map dec, String d, int pid) async {
+
+    final resp2 = await http.get('https://braintrainapi.com/btapi/parents');
+    //If http.get is successful
+    if (resp2.statusCode == 200) {
+      List btjson2 = json.decode(resp2.body.toString());
+      List<checkDB.Parents> parsList2 = checkDB.createParentsList(btjson2);
+      var tot_par2 = parsList2.length;
+
+      String pidSalt = json.encode(dec);
+      for (int i = 0; i < tot_par2; i++) {
+        //find just created email, may make logic diff here eventually
+        if (parsList2[i].email == d) {
+          pid = parsList2[i].parent_id;
+          //put parent id in DB for ref to salt
+          dec["Parent_id"] = pid;
+          pidSalt = json.encode(dec);
+          print(pidSalt);
+
+          //store salt associated with registered parent using POST
+          http.post('https://braintrainapi.com/btapi/parents',
+              headers: {"Content-Type": "application/json"}, body: pidSalt)
+              .then((response) {
+            print("Storing of salt w/ PID complete");
+            //print("Response status: ${response.statusCode}");
+            //print("Response body: ${response.body}");
+          });
+          return;
+        }
+      }
     }
     else
       print("Unsuccessful connection to BT API, please contact web server admin");
@@ -117,12 +179,65 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
         }
       }
 
+      //BELOW: hash and salt logic for insertion to DB
+      int tid;
+      String tSalt;
+
+      //salt creation
+      tSalt = rnd.randomAlphaNumeric(32);
+      decoded["salt"] = tSalt;
+
+      //Hashing function: SHA 256 + 32 byte salt, will make more robust in future
+      var tPass = utf8.encode(decoded["password"] + tSalt);
+      var tHash = sha256.convert(tPass);
+
+      //Prepare hash for POST
+      decoded["password"] = tHash.toString();
+      tJS = json.encode(decoded);
+
       http.post('https://braintrainapi.com/btapi/teachers',
           headers: {"Content-Type": "application/json"}, body: tJS).then
         ((response) {
-        print("Response status: ${response.statusCode}");
-        print("Response body: ${response.body}");
+        //print("Response status: ${response.statusCode}");
+        //print("Response body: ${response.body}");
+        print("storing salt...");
+        teachSalt(decoded, decoded["email"], tid);
       });
+    }
+    else
+      print("Unsuccessful connection to BT API, please contact web server admin");
+  }
+
+  void teachSalt(Map dec, String d, int tid) async {
+
+    final resp = await http.get('https://braintrainapi.com/btapi/teachers');
+    //If http.get is successful
+    if (resp.statusCode == 200) {
+      List btjson = json.decode(resp.body.toString());
+      List<checkDB.Teachers> teachList = checkDB.createTeachersList(btjson);
+      var tot_par2 = teachList.length;
+
+      String tidSalt = json.encode(dec);
+      for (int i = 0; i < tot_par2; i++) {
+        //find just created email, may make logic diff here eventually
+        if (teachList[i].email == d) {
+          tid = teachList[i].teacher_id;
+          //put teacher id in DB for ref to salt
+          dec["Teacher_id"] = tid;
+          tidSalt = json.encode(dec);
+          //print(tidSalt);
+
+          //store salt associated with registered teacher using POST
+          http.post('https://braintrainapi.com/btapi/teachers',
+              headers: {"Content-Type": "application/json"}, body: tidSalt)
+              .then((response) {
+            print("Storing of salt w/ TID complete");
+            //print("Response status: ${response.statusCode}");
+            print("Response body: ${response.body}");
+          });
+          return;
+        }
+      }
     }
     else
       print("Unsuccessful connection to BT API, please contact web server admin");
