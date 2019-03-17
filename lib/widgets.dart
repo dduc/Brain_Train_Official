@@ -199,7 +199,7 @@ void _showDialog() {
     final box3 = greenTriangleWidget();
 
     AudioCache player = new AudioCache();
-    const correctAudioPath = "correct.ogg";
+    const correctAudioPath = "shape_matching/correct.ogg";
 
     String acceptedData = "drag here";
 
@@ -363,7 +363,8 @@ void _showDialog() {
           children: <Widget>[
             new Container(
               decoration: new BoxDecoration(
-                image: new DecorationImage(image: new AssetImage("assets/shape_matching/colored_talltrees.png"),fit: BoxFit.cover),
+                image: new DecorationImage(image: new AssetImage("assets/shape_matching/colored_talltrees.png"),
+                    fit: BoxFit.cover),
               ),
             ),
             new Positioned(

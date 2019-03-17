@@ -91,7 +91,7 @@ class _MarblesGameState extends State<marblesgame> with TickerProviderStateMixin
     var marbleChildren = <Widget>[
     ];
 
-    for(int i = 0; i < 9; i++) {
+    //for(int i = 0; i < 9; i++) {
       var marble = new Positioned(
         top: widget.offset1.dy,
         left: widget.offset1.dx,
@@ -101,12 +101,12 @@ class _MarblesGameState extends State<marblesgame> with TickerProviderStateMixin
           feedback: marbleWidget(),
           childWhenDragging: new Opacity(opacity: 0.0, child:marbleWidget()),
           onDraggableCanceled: (v,o) {
-            setState(() { widget.offset1 = Offset(o.dx, o.dy + widget.height - 20);});
+            setState(() { widget.offset1 = Offset(o.dx, o.dy + widget.height - 75);});
           },
         ),
       );
       marbleChildren.add(marble);
-    }
+    //}
 
     return Scaffold(
       //appBar: AppBar(
