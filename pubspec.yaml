@@ -24,6 +24,7 @@ dependencies:
   sensors: ^0.3.0
   random_string: ^0.0.2
   postgres: ^1.0.2
+  path_provider: ^0.4.1
 
 dev_dependencies:
   flutter_test:

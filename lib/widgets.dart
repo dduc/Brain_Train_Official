@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'dart:math';
 import 'package:sensors/sensors.dart';
+import 'dart:async';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+
 
 class redSquareWidget extends StatelessWidget {
   @override
@@ -36,6 +41,24 @@ class greenTriangleWidget extends StatelessWidget {
     var assetsImage = new AssetImage('assets/shape_matching/tilegreen07.png');
     var image = new Image(image:assetsImage, width: 48, height: 48,);
     return Container(child:image,);
+  }
+}
+
+class SoundManager {
+  AudioPlayer audioPlayer = new AudioPlayer();
+
+  Future playLocal(localFileName) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file = new File("${dir.path}/$localFileName");
+    if (!(await file.exists())) {
+      final soundData = await rootBundle.load("assets/shape_matching/$localFileName");
+      final bytes = soundData.buffer.asUint8List();
+      await file.writeAsBytes(bytes, flush: true);
+    }
+    await audioPlayer.play(file.path, isLocal: true);
+  }
+  Future stop() async {
+    await audioPlayer.stop();
   }
 }
 
@@ -124,6 +147,7 @@ class _DraggableWidgetState extends State<DraggableWidget> with TickerProviderSt
     sparklesAnimation.addListener(() {
       setState(() {});
     });
+
   }
 
   dispose() {
@@ -188,18 +212,25 @@ void _showDialog() {
   String answerData = "red";
   var lastNum = 0;
 
+  bool game_initialized = false;
+
   var lastUpdate = 0;
   double lastx,lasty,lastz;
 
+  AudioPlayer audioPlayer = new AudioPlayer();
+  SoundManager soundManager = new SoundManager();
+
   @override
   Widget build(BuildContext context) {
+    soundManager.stop();
 
     redSquareWidget box = redSquareWidget();
     final box2 = blueSquareWidget();
     final box3 = greenTriangleWidget();
 
     AudioCache player = new AudioCache();
-    const correctAudioPath = "shape_matching/correct.ogg";
+
+    const correctAudioPath = "shape_matching/good_job_2.mp3";
 
     String acceptedData = "drag here";
 
@@ -357,6 +388,19 @@ void _showDialog() {
     */
     ////////////////////////////////////////////////////////
 
+    if(game_initialized == false)
+    {
+
+      Future.delayed(const Duration(milliseconds: 500), () {
+        //audioPlayer.play("shape_matching/red_square_1.mp3",isLocal: true);
+        //soundManager.playLocal("shape_matching/red_square_1.mp3");
+        soundManager.playLocal("red_square_1.mp3").then((onValue) {
+          //do something?
+        });
+      });
+      game_initialized = true;
+    }
+
     return Scaffold(
       body: new Container(
         child: new Stack(
@@ -403,13 +447,16 @@ void _showDialog() {
                   return true;
                 },
                 onAccept: (String data) {
+                  soundManager.stop();
                   acceptedData = data;
                   if(data == answerData) {
                     animationInit = false;
                     sparklesAnimationController.forward(from: 0.0);
 
-                    player.play(correctAudioPath);
-                    //Scaffold.of(context).showSnackBar(SnackBar(content: Text("good job!!")));
+                    player.play("shape_matching/correct.ogg");
+                    Future.delayed(const Duration(seconds: 1), () {
+                      player.play(correctAudioPath);
+                    });
 
                     var rng = new Random();
                     var num = rng.nextInt(3);
@@ -422,14 +469,30 @@ void _showDialog() {
                     if(num == 1) {
                       answerData = "green";
                       target = greenTriangleWidget();
+                      Future.delayed(const Duration(milliseconds: 2500), () {
+                        soundManager.playLocal("green_triangle_1.mp3").then((onValue) {
+                          //do something?
+                        });
+                        //audioPlayer.play("shape_matching/green_triangle_1.mp3");
+                      });
                     }
                     else if(num == 2) {
                       answerData = "blue";
                       target = blueSquareWidget();
+                      Future.delayed(const Duration(milliseconds: 2500), () {
+                        soundManager.playLocal("blue_square_1.mp3").then((onValue) {
+                          //do something?
+                        });
+                      });
                     }
                     else {
                       answerData = "red";
                       target = redSquareWidget();
+                      Future.delayed(const Duration(milliseconds: 2500), () {
+                        soundManager.playLocal("red_square_1.mp3").then((onValue) {
+                          //do something?
+                        });
+                      });
                     }
                     lastNum = num;
                     //target = test2;
