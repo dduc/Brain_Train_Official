@@ -8,7 +8,10 @@ import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
+//* individual classes created for each image as a quick solution. optimization
+//will be done down the line.
 
+//create a class for the red Square
 class redSquareWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -17,14 +20,8 @@ class redSquareWidget extends StatelessWidget {
     return Container(child:image,);
   }
 }
-class smallredSquareWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var assetsImage = new AssetImage('assets/shape_matching/tilered01.png');
-    var image = new Image(image: assetsImage, width: 24, height: 24,color: Color.fromRGBO(255,0,0,0.5));
-    return Container(child:image, );
-  }
-}
+
+//create a class for the blue square
 class blueSquareWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -35,6 +32,7 @@ class blueSquareWidget extends StatelessWidget {
   }
 }
 
+//create a class for the green triangle.
 class greenTriangleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -44,6 +42,7 @@ class greenTriangleWidget extends StatelessWidget {
   }
 }
 
+//create a class for a sound manager
 class SoundManager {
   AudioPlayer audioPlayer = new AudioPlayer();
 
@@ -62,6 +61,7 @@ class SoundManager {
   }
 }
 
+//create a class for the area the animation is running
 class AnimationCanvasWidget extends StatelessWidget {
 
   @override
@@ -76,6 +76,8 @@ class AnimationCanvasWidget extends StatelessWidget {
 
 GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey();
 
+//class for the game. was named draggableImage from experimenting with
+//draggable images in flutter.
 class draggableImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -96,8 +98,7 @@ class draggableImage extends StatelessWidget {
   }
 }
 
-
-
+//widget for draggable images
 class DraggableWidget extends StatefulWidget {
   double width = 100, height = 100;
   Offset offset1, offset2, offset3;
@@ -108,17 +109,22 @@ class DraggableWidget extends StatefulWidget {
   _DraggableWidgetState createState() => _DraggableWidgetState();
 }
 
+//game state
 class _DraggableWidgetState extends State<DraggableWidget> with TickerProviderStateMixin{
+
+  //initialize variables that will be used down the line
   double _sparklesAngle = 0.0;
   AnimationController sparklesAnimationController;
   Animation sparklesAnimation;
 
-  var rng;
   double sparklesOpacity = 0;
   bool animationInit = true;
   
   double textOpacity = 0;
 
+  var rng;
+
+  //initialize state of game
   @override
   void initState() {
     // TODO: implement initState
@@ -133,10 +139,7 @@ class _DraggableWidgetState extends State<DraggableWidget> with TickerProviderSt
       widget.offset3 = Offset(0.0,0.0);
     }
 
-    //@override
-    //Widget build(BuildContext context) {
-
-    //}
+    //create random number generator and initialize animations.
     rng = new Random();
 
     sparklesAnimationController =
@@ -150,113 +153,70 @@ class _DraggableWidgetState extends State<DraggableWidget> with TickerProviderSt
 
   }
 
+  //dispose of animations when done.
   dispose() {
     super.dispose();
-    //scoreInAnimationController.dispose();
-    //scoreOutAnimationController.dispose();
     sparklesAnimationController.dispose();
   }
-/*
-  @override
-  Widget build(BuildContext context) {
-    final box = redSquareWidget();
-    final box2 = blueSquareWidget();
-    //final box = Container(
-      //width: 100.0,
-     // height: 100.0,
-    //  color: Colors.blue,
-    //);
-    return Positioned(
-      left: widget.offset.dx,
-      top: widget.offset.dy - widget.height + 20,
-      child: Draggable(
-        child:box, feedback: box,
-          //child: box, feedback: Container(
-            //width: 100.0,
-            //height: 100.0,
-            //color:Colors.blue.withOpacity(0.3),
-      //),
-        childWhenDragging: new Opacity(opacity: 0.0, child: box),
-        onDraggableCanceled: (v,o) {
-            setState(() => widget.offset = o);
-        },
-      ),
-     );
-  }
-*/
 
-void _showDialog() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: new Text("Alert Dialog title example"),
-        content: new Text("Alert Dialog body"),
-        actions: <Widget>[
-          new FlatButton(
-              child: new Text("close"),
-              onPressed: ()
-              {
-                Navigator.of(context).pop();
-              },
-          ),
-        ],
-      );
-    }
-  );
-}
-
+  /////////////////////////////////////////
+  //* name of game, data for dirks database.
   String gameName = "shapematching";
+  /////////////////////////////////////////
 
+
+  //create a red square widget with data for the square
   Widget target = redSquareWidget();
   String answerData = "red";
   var lastNum = 0;
 
+  //used for sound to check if game has started
   bool game_initialized = false;
 
-  var lastUpdate = 0;
-  double lastx,lasty,lastz;
-
+  //create audio player for quick sounds and sound manager for
+  //sounds that require more control (things like stop().
   AudioPlayer audioPlayer = new AudioPlayer();
   SoundManager soundManager = new SoundManager();
 
+
+  //things that are built in game. updated when set state {} is called.
   @override
   Widget build(BuildContext context) {
+    //stop any sound from sound manager if there is something playing
     soundManager.stop();
 
+    //create red square, blue square, and green triangle
     redSquareWidget box = redSquareWidget();
     final box2 = blueSquareWidget();
     final box3 = greenTriangleWidget();
 
+    //create audio cache for quick sounds
     AudioCache player = new AudioCache();
-
     const correctAudioPath = "shape_matching/good_job_2.mp3";
 
-    String acceptedData = "drag here";
-
-    Positioned test, test2;
-
+    //create doubles that contain the screen width and height
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    var extraSize = 0.0;
+    //the opacity of animation
     var scoreOpacity = 0.0;
-    var scorePosition = 0.0;
 
-    var shakeThreshold = 600;
-
+    //change opacity of image on the screen
     if(sparklesAnimation.value < 1 && animationInit != true)
     {
        textOpacity = 1;
     }
     else
-      {
-          textOpacity = 0;
-      }
+    {
+       textOpacity = 0;
+    }
 
+    //create stack of widgets that will hold all the stars for the
+    //animation
     var stackChildren = <Widget>[
     ];
 
+    //variables for animation
     var firstAngle = _sparklesAngle;
     var sparkleRadius = (sparklesAnimationController.value*10) ;
     sparklesOpacity = (1 - sparklesAnimation.value);
@@ -265,8 +225,9 @@ void _showDialog() {
         sparklesOpacity = 0;
     }
     var _neg = -1;
-    double gravity = 1;
 
+    //create stars used for animation and position them depending on
+    //how much time has passed after animation has started.
     for(int i = 0;i < 8; ++i) {
       var currentAngle = (firstAngle + ((2*pi)/5)*(i));
       var sparklesWidget =
@@ -275,125 +236,27 @@ void _showDialog() {
           child: new Opacity(opacity: sparklesOpacity,
               child : new Image.asset("assets/shape_matching/starGold.png", width: 96.0, height: 96.0, ))
       ),
-        //left: pow(sparkleRadius,1.2)*cos(currentAngle) + screenWidth/2,
-        //top: (sparkleRadius*sin(currentAngle)) + screenHeight/2,
         left: screenWidth/2.5 + pow(sparkleRadius,1.4)*_neg*(i+1),
         top: 400 - (sparkleRadius*50) - (sparkleRadius*2)*(i+1) + pow(sparkleRadius,2.6),
       );
       stackChildren.add(sparklesWidget);
-      gravity *= 3;
       _neg *= -1;
     }
 
+    //add the stars to the stack
     stackChildren.add(new Opacity(opacity: scoreOpacity, child: AnimationCanvasWidget()));
 
     ///////////////////////
-    test = new Positioned(left: 150,
-      top: 400,
-      width: 100,
-      height: 100,
-      child: DragTarget(
-        builder:(
-            context,
-            accepted,
-            rejected,
-            ) => Opacity(child: box,opacity: 0.5),
-        //Container(
-        //width: 100,
-        //height: 100,
-        //color: Colors.amberAccent,
-        //child: Center(child: Text(acceptedData.toString())),
-        //),
-        onWillAccept: (data) {
-          return true;
-        },
-        onAccept: (String data) {
-          acceptedData = data;
-          if(data == answerData) {
-            Scaffold.of(context).showSnackBar(SnackBar(content: Text("good job!!")));
-              answerData = "green";
-              //target = test2;
-          }
-          else {
-            Scaffold.of(context).showSnackBar(SnackBar(content: Text("try again.")));
-          }
-        },
-      ),);
 
-    /////////
-
-    test2 = new Positioned(left: 150,
-      top: 400,
-      width: 100,
-      height: 100,
-      child: DragTarget(
-        builder:(
-            context,
-            accepted,
-            rejected,
-            ) => Opacity(child: box3,opacity: 0.5),
-        //Container(
-        //width: 100,
-        //height: 100,
-        //color: Colors.amberAccent,
-        //child: Center(child: Text(acceptedData.toString())),
-        //),
-        onWillAccept: (data) {
-          return true;
-        },
-        onAccept: (String data) {
-          acceptedData = data;
-          if(data == answerData) {
-            Scaffold.of(context).showSnackBar(SnackBar(content: Text("good job!!")));
-            answerData = "green";
-          }
-          else {
-            Scaffold.of(context).showSnackBar(SnackBar(content: Text("try again.")));
-          }
-        },
-      ),);
     ////////////////////////
-
-    //target = redSquareWidget();
-
-    ////////////ACCELEROMETER EVENTS////////////////
-    //
-    /*
-    accelerometerEvents.listen((AccelerometerEvent event) {
-          //code
-      double x = event.x;
-      double y = event.y;
-      double z = event.z;
-
-      var time = new DateTime.now().millisecondsSinceEpoch;
-      //Scaffold.of(context).showSnackBar(SnackBar(content: Text(time.toString())));
-
-      if(time - lastUpdate > 10) {
-        var diff = time - lastUpdate;
-        lastUpdate = time;
-
-        double val = x + y + z - lastx - lasty - lastz;
-        double speed = val.abs()/diff*5000;
-
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text(speed.toString())));
-        if(x != lastx) {
-          Scaffold.of(context).showSnackBar(SnackBar(content: Text("phone is SHOOK")));
-          lastx = x;
-        }
-        //lastx = event.x;
-        lasty = event.y;
-        lastz = event.z;
-      }
-    });
-    */
     ////////////////////////////////////////////////////////
 
+    //if game was first initialized play starting sound, then
+    //set game as initialized
     if(game_initialized == false)
     {
 
       Future.delayed(const Duration(milliseconds: 500), () {
-        //audioPlayer.play("shape_matching/red_square_1.mp3",isLocal: true);
-        //soundManager.playLocal("shape_matching/red_square_1.mp3");
         soundManager.playLocal("red_square_1.mp3").then((onValue) {
           //do something?
         });
@@ -401,7 +264,9 @@ void _showDialog() {
       game_initialized = true;
     }
 
+    //scaffold for the game itself
     return Scaffold(
+      //background image, kept in a container
       body: new Container(
         child: new Stack(
           children: <Widget>[
@@ -411,22 +276,19 @@ void _showDialog() {
                     fit: BoxFit.cover),
               ),
             ),
+            //good job text that shows up after correct answer
             new Positioned(
               left: screenWidth/2 - 264/2,
               top: screenHeight/12,
               child: Opacity(opacity: textOpacity,  child: Image(image: AssetImage("assets/shape_matching/Good_Job.png")),)
             ),
+            //stars
             new Positioned(
               child: new Stack(
-                //alignment: FractionalOffset.center,
-                //overflow: Overflow.visible,
                 children: stackChildren,
-              )
-              ,
-              //left: screenWidth/2,
-              //top: screenHeight/2,
-              //bottom: 50
+              ),
             ),
+            //the target for the shapes to be dragged to
             new Positioned(left: screenWidth/2 - 100/2,
               top: 400,
               width: 100,
@@ -437,27 +299,24 @@ void _showDialog() {
                     accepted,
                     rejected,
                     ) => Opacity(child: target,opacity: 0.5),
-                //Container(
-                //width: 100,
-                //height: 100,
-                //color: Colors.amberAccent,
-                //child: Center(child: Text(acceptedData.toString())),
-                //),
                 onWillAccept: (data) {
                   return true;
                 },
+                //if correct answer
                 onAccept: (String data) {
-                  soundManager.stop();
-                  acceptedData = data;
                   if(data == answerData) {
+                    //initialize and play animation
                     animationInit = false;
                     sparklesAnimationController.forward(from: 0.0);
 
+                    //play "good job" sound effect
                     player.play("shape_matching/correct.ogg");
                     Future.delayed(const Duration(seconds: 1), () {
                       player.play(correctAudioPath);
                     });
 
+                    //create new random number from random number
+                    //generator to randomly pick a new shape
                     var rng = new Random();
                     var num = rng.nextInt(3);
 
@@ -466,6 +325,7 @@ void _showDialog() {
                       num = rng.nextInt(3);
                     }
 
+                    //pick the new shape
                     if(num == 1) {
                       answerData = "green";
                       target = greenTriangleWidget();
@@ -473,7 +333,6 @@ void _showDialog() {
                         soundManager.playLocal("green_triangle_1.mp3").then((onValue) {
                           //do something?
                         });
-                        //audioPlayer.play("shape_matching/green_triangle_1.mp3");
                       });
                     }
                     else if(num == 2) {
@@ -495,13 +354,13 @@ void _showDialog() {
                       });
                     }
                     lastNum = num;
-                    //target = test2;
                   }
                   else {
-                    //Scaffold.of(context).showSnackBar(SnackBar(content: Text("try again.")));
+                    //if answer is incorrect, do nothing
                   }
                 },
               ),),
+            // positioned for red square
             new Positioned(
               left: widget.offset1.dx,
                 top: widget.offset1.dy - widget.height + 20,
@@ -510,13 +369,12 @@ void _showDialog() {
                   child: box, feedback: box,
               childWhenDragging: new Opacity(opacity: 0.0, child: box),
               onDraggableCanceled: (v,o) {
-                    //setState(() { widget.offset1 = Offset(o.dx, o.dy + widget.height - 20);});
+                  // do nothing if drag is canceled
               },
               ),
             ),
+            // positioned for blue square
             new Positioned(
-              //left: 300,
-              //top: 300,
               left: widget.offset2.dx,
               top: widget.offset2.dy - widget.height + 20,
               child: Draggable(
@@ -524,13 +382,12 @@ void _showDialog() {
                 child: box2, feedback: box2,
                 childWhenDragging: new Opacity(opacity: 0.0, child: box2),
                 onDraggableCanceled: (v,o) {
-                  //setState(() => widget.offset2 = Offset(o.dx, o.dy + widget.height - 20));
+                  //...
                 },
               ),
             ),
+            // positioned for green triangle
             new Positioned(
-              //left: 300,
-              //top: 300,
               left: widget.offset3.dx,
               top: widget.offset3.dy - widget.height + 20,
               child: Draggable(
@@ -538,7 +395,7 @@ void _showDialog() {
                 child: box3, feedback: box3,
                 childWhenDragging: new Opacity(opacity: 0.0, child: box3),
                 onDraggableCanceled: (v,o) {
-                  //setState(() => widget.offset3 = Offset(o.dx, o.dy + widget.height - 20));
+                  //...
                 },
               ),
             ),

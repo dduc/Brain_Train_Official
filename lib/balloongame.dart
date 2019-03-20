@@ -3,7 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'dart:math';
 import 'package:sensors/sensors.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 
+//The class for the balloon game
 class balloongame extends StatefulWidget {
   //balloongame({Key key, this.title}) : super(key: key);
 
@@ -22,6 +27,26 @@ class balloongame extends StatefulWidget {
   _BalloonGameState createState() => _BalloonGameState();
 }
 
+//Sound manager for sounds that require more control
+class SoundManager {
+  AudioPlayer audioPlayer = new AudioPlayer();
+
+  Future playLocal(localFileName) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file = new File("${dir.path}/$localFileName");
+    if (!(await file.exists())) {
+      final soundData = await rootBundle.load("assets/balloon_game/$localFileName");
+      final bytes = soundData.buffer.asUint8List();
+      await file.writeAsBytes(bytes, flush: true);
+    }
+    await audioPlayer.play(file.path, isLocal: true);
+  }
+  Future stop() async {
+    await audioPlayer.stop();
+  }
+}
+
+//class for area the animation will be played
 class AnimationCanvasWidget extends StatelessWidget {
 
   @override
@@ -35,6 +60,7 @@ class AnimationCanvasWidget extends StatelessWidget {
 }
 
 
+//game state
 class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin {
   //add variables
   AnimationController sparklesAnimationController;
@@ -44,6 +70,7 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
   double textOpacity = 0;
   bool animationInit = true;
 
+  //initialize game state
   initState() {
     super.initState();
 
@@ -57,19 +84,16 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
     });
   }
 
+  //dispose of animation when done
   dispose() {
     super.dispose();
     sparklesAnimationController.dispose();
   }
 
-  void _incrementCounter() {
-
-  }
-
   //game variables that should not change with set State.
-
   var lastnum = 0;
 
+  //random number generator
   var rng = new Random();
   var num = 1;
   var correctcount = 2;
@@ -80,9 +104,17 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
   var incorrectnum1 = 3;
   var incorrectnum2 = 4;
 
+  //sound manager
+  SoundManager soundManager = new SoundManager();
+
+  //flag to check if game was first initialized
+  bool game_initialized = false;
+
+  //build for game. updated when "set state {}" is called.
   @override
   Widget build(BuildContext context) {
 
+    //variables for screen width and height
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey();
@@ -93,21 +125,38 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
 
+    //check if game is initialized, if it is first started play sound then
+    //set game as initialized
+    if(game_initialized == false)
+    {
+
+      Future.delayed(const Duration(milliseconds: 500), () {
+        soundManager.playLocal("balloons_1.mp3").then((onValue) {
+          //do something?
+        });
+      });
+      game_initialized = true;
+    }
+
+    //stack variable to keep balloon images
     var balloonChildren = <Widget>[
     ];
-    double topvalue, leftvalue;
 
+    //balues that move the balloons to the correct positions
+    double topvalue, leftvalue;
     double offsetvalue = 1;
     double offsetvalue2 = 1;
     if(num == 1)
-      {
+    {
         offsetvalue = 1.5;
-      }
+    }
     if(num == 3)
-      {
+    {
         offsetvalue2 = .75;
-      }
+    }
 
+    //set the positions of the balloons depending on how many baloons
+    //are on the screen
     for(int i = 0; i < num + 1; ++i)
     {
       //set positions of balloons
@@ -146,11 +195,13 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
       balloonChildren.add(balloon);
     }
 
+    //strings for the numbers at the bottom of the screen
     var string1 = "assets/balloon_game/number1.png";
     var string2 = "assets/balloon_game/number2.png";
     var string3 = "assets/balloon_game/number3.png";
 
 
+    //set the numbers at the bottom of the screen.
     if(num2 == 0)
     {
       string1 = "assets/balloon_game/number$correctcount.png";
@@ -174,13 +225,12 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
     var stackChildren = <Widget>[
     ];
 
+      //variables for animation
     double _sparklesAngle = 0.0;
-
     var confettinum = 1;
     var _neg = -1;
 
     var firstAngle = _sparklesAngle;
-    var sparkleRadius = (sparklesAnimationController.value*10) ;
     sparklesOpacity = (1 - sparklesAnimation.value);
     if(animationInit == true)
     {
@@ -196,6 +246,7 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
       textOpacity = 0;
     }
 
+    //create confetti
     for(int i = 0;i < 20; ++i) {
       var currentAngle = (firstAngle + ((2*pi)/5)*(i));
       var sparklesWidget =
@@ -204,8 +255,6 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
           child: new Opacity(opacity: sparklesOpacity,
               child : new Image.asset("assets/balloon_game/confetti$confettinum.png", width: 96.0, height: 96.0, ))
       ),
-        //left: pow(sparkleRadius,1.2)*cos(currentAngle) + screenWidth/2,
-        //top: (sparkleRadius*sin(currentAngle)) + screenHeight/2,
         left: screenWidth - (i+1)*(screenWidth/20) - 30,
         top: screenHeight - screenHeight*sparklesOpacity + 25*(i%8)*_neg,
       );
@@ -226,54 +275,54 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
       body: Stack(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        //child: new redSquareWidget()
         children: <Widget>[
+          //background
           new Container(
             decoration: new BoxDecoration(
               image: new DecorationImage(image: new AssetImage("assets/balloon_game/clouds.png"),fit: BoxFit.cover),
             ),
           ),
+          //good job text
           new Positioned(
               left: screenWidth/2 - 264/2,
               top: screenHeight/12,
               child: Opacity(opacity: textOpacity,  child: Image(image: AssetImage("assets/shape_matching/Good_Job.png")),)
           ),
+          //balloons
           new Positioned(
             child: new Stack(
-              //alignment: FractionalOffset.center,
-              //overflow: Overflow.visible,
               children: balloonChildren,
             ),
           ),
+          //confetti animation
           new Positioned(
             child: new Stack(
-              //alignment: FractionalOffset.center,
-              //overflow: Overflow.visible,
               children: stackChildren,
-            )
-            ,
-            //left: screenWidth/2,
-            //top: screenHeight/2,
-            //bottom: 50
+            ),
           ),
-          //new Positioned(
-          //  top: screenHeight/2 - 125/2,
-          //  left: screenWidth/2 - 59/2,
-          //  child: Image.asset("assets/balloon_game/red_balloon.png"),
-          //),
+
+          //next 3 positioned are the numbers, each one will have the same
+          //variables and logic, but I will only include comments for one.
           new Positioned(
+            //position of number
             top: screenHeight/1.1 - 76/2,
             left: screenWidth/10 - 37/2,
             child: FlatButton(
               child: Image.asset(string1),
+              //if pressed
               onPressed: () {
+                //if this is the correct number
                 if(num2 == 0)
                 {
+                  //initialize and start animation
                   animationInit = false;
                   sparklesAnimationController.forward(from: 0.0);
+
+                  //create new random number for this number
                   var rng = new Random();
                   num = rng.nextInt(5);
 
+                    //make sure it is not the same as last time
                   while (num == lastnum)
                   {
                     num = rng.nextInt(5);
@@ -281,6 +330,8 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
                   lastnum = num;
                   correctcount = num+1;
 
+                  //create random number for the other two numbers that are
+                  //going to be the wrong answers
                   rng2 = new Random();
                   num2 = rng2.nextInt(3);
 
@@ -308,19 +359,24 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
               onPressed: () {
                 if(num2 == 1)
                 {
+                  //initialize animation and play
                   animationInit = false;
                   sparklesAnimationController.forward(from: 0.0);
+
+                  //create new random number
                   var rng = new Random();
                   num = rng.nextInt(5);
 
+                  //make sure it is not the same as last time
                   while (num == lastnum)
                   {
                     num = rng.nextInt(5);
                   }
                   lastnum = num;
-
                   correctcount = num+1;
 
+                  //create random numbers for the next two incorrect
+                  //numbers
                   rng2 = new Random();
                   num2 = rng2.nextInt(3);
 
@@ -347,12 +403,15 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
               child: Image.asset(string3),
               onPressed: () {
                 if(num2 == 2) {
+                  //initialize and play animation
                   animationInit = false;
                   sparklesAnimationController.forward(from: 0.0);
 
+                  //create new random number
                   var rng = new Random();
                   num = rng.nextInt(5);
 
+                  //make sure it is not the same as last time
                   while (num == lastnum)
                   {
                     num = rng.nextInt(5);
@@ -360,6 +419,8 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
                   lastnum = num;
                   correctcount = num+1;
 
+                  //create random numbers for the other two incorrect
+                  //numbers
                   rng2 = new Random();
                   num2 = rng2.nextInt(3);
 
@@ -375,7 +436,7 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
                   }
 
                   setState(() {
-                    //num = nextInt(5);
+
                   });
                 }
               },),
