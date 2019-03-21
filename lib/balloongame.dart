@@ -106,6 +106,10 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
 
   //sound manager
   SoundManager soundManager = new SoundManager();
+  bool soundInterupted = false;
+
+  //create audio cache for quick sounds
+  AudioCache player = new AudioCache();
 
   //flag to check if game was first initialized
   bool game_initialized = false;
@@ -244,6 +248,7 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
     else
     {
       textOpacity = 0;
+      soundInterupted = false;
     }
 
     //create confetti
@@ -311,9 +316,25 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
               child: Image.asset(string1),
               //if pressed
               onPressed: () {
+                if(sparklesAnimation.value < 1 && animationInit != true)
+                {
+                  soundInterupted = true;
+                }
                 //if this is the correct number
                 if(num2 == 0)
                 {
+                  //play "good job" sound effect
+                  soundManager.playLocal("good_job_2.mp3").then((onValue) {
+                    //do something?
+                  });
+                  Future.delayed(const Duration(milliseconds: 4500), () {
+                    if(soundInterupted == false) {
+                      soundManager.playLocal("balloons_1.mp3").then((onValue) {
+                        //do something?
+                      });
+                    }
+                  });
+
                   //initialize and start animation
                   animationInit = false;
                   sparklesAnimationController.forward(from: 0.0);
@@ -357,8 +378,24 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
             child: FlatButton(
               child: Image.asset(string2),
               onPressed: () {
+                if(sparklesAnimation.value < 1 && animationInit != true)
+                {
+                  soundInterupted = true;
+                }
                 if(num2 == 1)
                 {
+                  //play "good job" sound effect
+                  soundManager.playLocal("good_job_2.mp3").then((onValue) {
+                    //do something?
+                  });
+                  Future.delayed(const Duration(milliseconds: 4500), () {
+                    if(soundInterupted == false) {
+                      soundManager.playLocal("balloons_1.mp3").then((onValue) {
+                        //do something?
+                      });
+                    }
+                  });
+
                   //initialize animation and play
                   animationInit = false;
                   sparklesAnimationController.forward(from: 0.0);
@@ -402,7 +439,23 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
             child: FlatButton(
               child: Image.asset(string3),
               onPressed: () {
+                if(sparklesAnimation.value < 1 && animationInit != true)
+                {
+                  soundInterupted = true;
+                }
                 if(num2 == 2) {
+                  //play "good job" sound effect
+                  soundManager.playLocal("good_job_2.mp3").then((onValue) {
+                    //do something?
+                  });
+                  Future.delayed(const Duration(milliseconds: 4500), () {
+                    if(soundInterupted == false) {
+                      soundManager.playLocal("balloons_1.mp3").then((onValue) {
+                        //do something?
+                      });
+                    }
+                  });
+
                   //initialize and play animation
                   animationInit = false;
                   sparklesAnimationController.forward(from: 0.0);
