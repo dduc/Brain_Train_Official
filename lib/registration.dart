@@ -31,15 +31,19 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
   AnimationController iconAnimationController;
   Animation<double> iconAnimation;
 
+  //********** Dirk's part of code *************//
   final passController = TextEditingController();
   final emailController = TextEditingController();
+  final userController = TextEditingController();
   final ageController = TextEditingController();
+  final cAgeController = TextEditingController();
   final classController = TextEditingController();
 
-  regUser(String uemail, String upass, String uclass, String uagegroup) {
+  regUser(String uemail, String upass, String uname, String uclass, String uagegroup, String ca) {
     Map<String,dynamic> parentJsonMap = {
       'email' : uemail,
       'password' : upass,
+      'uname': uname,
       'salt': "",
       'Parent_id':""
     };
@@ -47,16 +51,22 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
     Map<String,dynamic> teacherJsonMap = {
       'email' : uemail,
       'password' : upass,
+      'uname' : uname,
       'class_num' : uclass,
       'age_group' : uagegroup,
       'salt': "",
       'Teacher_id': ""
     };
 
+    Map<String,dynamic> playerJsonMap = {
+    'age':ca
+    };
+
     if(uclass == "" && uagegroup == "") {
-      print("Registering Parent...");
+      print("Registering Parent w/ player...");
       String pJsonString = json.encode(parentJsonMap);
-      regParent(pJsonString);
+      String plJsonString = json.encode(playerJsonMap);
+      regParent(pJsonString,plJsonString);
     }
 
     if(uclass != "" && uagegroup != "") {
@@ -67,7 +77,7 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
 
   }
 
-  void regParent(String pJS) async {
+  void regParent(String pJS,String plJS) async {
     int r = 1;
     final resp = await http.get('https://braintrainapi.com/btapi/parents');
     //If http.get is successful
@@ -84,6 +94,12 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
       for (int i = 0; i < tot_par; i++) {
         if (parsList[i].email == decoded["email"]) {
           print("Parent email already exists,registration incomplete");
+          //put prompt here for email already exists
+          return;
+        }
+        if (parsList[i].username != '' && parsList[i].username == decoded["uname"]) {
+          print("Parent username already exists,registration incomplete");
+          //put prompt here for username already exists
           return;
         }
       }
@@ -116,10 +132,18 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
         print("storing salt...");
         parSalt(decoded, decoded["email"], pid);
       });
+
+      //register player for parent, and also insert age
+      //http.post('https://braintrainapi.com/btapi/players',
+          //headers: {"Content-Type": "application/json"}, body: plJS).then((
+          //response) {
+        //print("Response status: ${response.statusCode}");
+        //print("Response body: ${response.body}");
+        //print("Player Creation Complete");
+      //});
     }
     else
-      print(
-          "Unsuccessful connection to BT API, please contact web server admin");
+      print("Unsuccessful connection to BT API, please contact web server admin");
   }
 
   void parSalt(Map dec, String d, int pid) async {
@@ -175,6 +199,10 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
         //print(decoded["email"]);
         if (teachersList[i].email == decoded["email"]) {
           print("Teacher email already exists,registration incomplete");
+          return;
+        }
+        if (teachersList[i].username == decoded["uname"]) {
+          print("Teacher username already exists,registration incomplete");
           return;
         }
       }
@@ -257,6 +285,7 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
     iconAnimation.addListener(()=> this.setState((){}));
     iconAnimationController.forward();
   }
+  //************End of most of Dirks code *************//
 
   @override
   Widget build(BuildContext context) {
@@ -285,7 +314,7 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
                         inputDecorationTheme: new InputDecorationTheme(
                             labelStyle: new TextStyle(
                               color: Colors.black87,
-                              fontSize: 20.0,
+                              fontSize: 15.0,
                             )
                         )
                     ),
@@ -296,7 +325,7 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
                         children: <Widget>[
                           new TextFormField(
                             style: TextStyle(
-                              color: Colors.black
+                              color: Colors.black,
                             ),
                             decoration: new InputDecoration(
                               labelText: "Enter Email",
@@ -320,11 +349,30 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
                                 color: Colors.black
                             ),
                             decoration: new InputDecoration(
+                              labelText: "Enter Username",
+                            ),
+                            keyboardType: TextInputType.text,
+                            controller: userController,
+                          ),
+                          new TextFormField(
+                            style: TextStyle(
+                                color: Colors.black
+                            ),
+                            decoration: new InputDecoration(
+                              labelText: "Enter Child's Age (Parents,optional)",
+                            ),
+                            keyboardType: TextInputType.text,
+                            controller: cAgeController,
+                          ),
+                          new TextFormField(
+                            style: TextStyle(
+                                color: Colors.black
+                            ),
+                            decoration: new InputDecoration(
                               labelText: "Enter Class Number (Teachers)",
                             ),
                             keyboardType: TextInputType.text,
                             controller: classController,
-                            obscureText: false,
                           ),
                           new TextFormField(
                             style: TextStyle(
@@ -335,7 +383,6 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
                             ),
                             keyboardType: TextInputType.text,
                             controller: ageController,
-                            obscureText: false,
                           ),
                           new Padding(
                               padding: const EdgeInsets.only(
@@ -344,14 +391,16 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
                           new MaterialButton(
                             color: Colors.blue,
                             textColor: Colors.white,
-                            child: new Text("Register"),
+                            child: new Text("Submit"),
                             onPressed: () {
                               String ema = emailController.text;
                               String pass = passController.text;
                               String clas = classController.text;
                               String ag = ageController.text;
+                              String cag = cAgeController.text;
+                              String un = userController.text;
 
-                              regUser(ema,pass,clas,ag);
+                              regUser(ema,pass,un,clas,ag,cag);
                               },
                             splashColor: Colors.redAccent,
                           ),

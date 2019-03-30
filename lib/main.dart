@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+//********** Dirk's part of code *************//
 //Parent object constructor for json data
 class Parents {
   final int parent_id;
@@ -112,7 +113,6 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
   AnimationController iconAnimationController;
   Animation<double> iconAnimation;
 
-  //Dirk's LoginPageState code
   bool loadCircle = false;
   int r = 1;
   bool loggedIn = false;
@@ -194,6 +194,7 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
         return salt[0][0].toString();
       }
     }
+    connection.close();
   }
 
   Future<String> checkTS(String te) async {
@@ -220,6 +221,7 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
         return salt[0][0].toString();
       }
     }
+    connection.close();
   }
 
   void getAuth(String email, String pass) async {
@@ -248,7 +250,11 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
 
     //stop checking if email isn't a parent email
     for(int i = 0; i < tot_par; i++) {
-      if(pe != parentJsonData[i].email) {
+      if(pe == parentJsonData[i].email) {
+        break;
+      }
+      else {
+        print('Email not found in parents');
         return;
       }
     }
@@ -363,7 +369,7 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
     );
   }
 
-  //End of this sections Dirks code
+  //************End of most of Dirks code *************//
 
   @override
   void initState(){
@@ -386,8 +392,8 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
     // TODO: implement build
     return new Scaffold(
       backgroundColor: Colors.deepOrange,
-      //Logic to run loading screen
 
+      //Logic to run loading screen
       body:  loadCircle ? loadingScreen() :
       new Stack(
           fit: StackFit.expand,
@@ -458,7 +464,7 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
                           new MaterialButton(
                             color: Colors.blue,
                             textColor: Colors.white,
-                            child: new Text("Register New Account"),
+                            child: new Text("Create Account"),
                             onPressed: () {
 
                               Navigator.push(context,
