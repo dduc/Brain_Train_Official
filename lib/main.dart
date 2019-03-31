@@ -11,9 +11,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
-//DB imports
-import 'package:postgres/postgres.dart' as pg;
-
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
@@ -168,60 +165,60 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
       throw Exception('Failed to retrieve API data');
     }
   }
+  Future<String> checkPS(String pe,List<Parents> pJM) async {
+      for (int i = 0; i < pJM.length; i++) {
+        if (pJM[i].email == pe) {
 
+          print("Found pID associated with salt! Retrieving Salt...");
+          Map<String, dynamic> ps = {
+            'email': "",
+            'password': "",
+            'uname': "",
+            'salt': "",
+            'Parent_id': "",
+            "pD": pJM[i].parent_id.toString()
+          };
+          String pS = json.encode(ps);
+          //print(pS);
 
-  Future<String> checkPS(String pe) async {
-    var connection = new pg.PostgreSQLConnection(
-        "braintrainapi.com", 5432, "BrainTrain_App_WS", username: "postgres",
-        password: "Gka\$&@45!?hal");
-    await connection.open();
-
-    List<List<dynamic>> pid = await connection.query(
-        "SELECT parent_id from \"BT_App_WS\".parent where email = @email",
-        substitutionValues: {"email": pe});
-    //print(pid[0][0]);
-    int pD = int.parse(pid[0][0].toString());
-    //print(pD);
-
-    List<Parents> plist = await getParents();
-    for (int i = 0; i < plist.length; i++) {
-      if (plist[i].parent_id == pD) {
-        print("Found pID associated with salt! Retrieving Salt...");
-        List<dynamic> salt = await connection.query(
-            "SELECT salt from \"BT_App_WS\".s_parent where \"Parent_id\" = " +
-                plist[i].parent_id.toString() + ";");
-        //print(salt[0][0].toString());
-        return salt[0][0].toString();
+          final response = await http.post('https://braintrainapi.com/btapi/parents',
+              headers: {"Content-Type": "application/json"}, body: pS);
+            print("Parent salt retrieved, returning salt");
+          //print("Response status: ${response.statusCode}");
+          //print("Response body: ${response.body}");
+          return response.body;
+        }
       }
-    }
-    connection.close();
+      return "";
   }
 
-  Future<String> checkTS(String te) async {
-    var connection = new pg.PostgreSQLConnection(
-        "braintrainapi.com", 5432, "BrainTrain_App_WS", username: "postgres",
-        password: "Gka\$&@45!?hal");
-    await connection.open();
+  Future<String> checkTS(String te,List<Teachers> tJM) async {
+    for (int i = 0; i < tJM.length; i++) {
+      if (tJM[i].email == te) {
 
-    List<List<dynamic>> tid = await connection.query(
-        "SELECT teacher_id from \"BT_App_WS\".teacher where email = @email",
-        substitutionValues: {"email": te});
-
-    //print(tid[0][0]);
-    int tD = int.parse(tid[0][0].toString());
-    //print(tD);
-    List<Teachers> tlist = await getTeachers();
-    for (int i = 0; i < tlist.length; i++) {
-      if (tlist[i].teacher_id == tD) {
         print("Found tID associated with salt! Retrieving Salt...");
-        List<dynamic> salt = await connection.query(
-            "SELECT salt from \"BT_App_WS\".s_teacher where \"Teacher_id\" = " +
-                tlist[i].teacher_id.toString() + ";");
-        //print(salt[0][0].toString());
-        return salt[0][0].toString();
+        Map<String, dynamic> ts = {
+          'email' : "",
+          'password' : "",
+          'uname' : "",
+          'class_num' : "",
+          'age_group' : "",
+          'salt': "",
+          'Teacher_id': "",
+          "tD": tJM[i].teacher_id.toString()
+        };
+        String tS = json.encode(ts);
+        //print(tS);
+
+        final response = await http.post('https://braintrainapi.com/btapi/teachers',
+            headers: {"Content-Type": "application/json"}, body: tS);
+        print("Teacher salt retrieved, returning salt");
+        //print("Response status: ${response.statusCode}");
+        //print("Response body: ${response.body}");
+        return response.body;
       }
     }
-    connection.close();
+    return "";
   }
 
   void getAuth(String email, String pass) async {
@@ -248,42 +245,35 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
       pplist.add(parentJsonData[i].password);
     }
 
-    //stop checking if email isn't a parent email
-    for(int i = 0; i < tot_par; i++) {
-      if(pe == parentJsonData[i].email) {
-        break;
-      }
-      else {
-        print('Email not found in parents');
-        return;
-      }
-    }
+        Future<String> ps = checkPS(pe,parentJsonData);
+        ps.then((String pSalt) {
+          if(pSalt != "") {
+            //encode,hash,and salt pass for comparison
+            var pPass = utf8.encode(pp + pSalt);
+            var pHash = sha256.convert(pPass);
+            pp = pHash.toString();
 
-    Future <String> ps = checkPS(pe);
-    ps.then((String pSalt) {
-
-      //encode,hash,and salt pass for comparison
-      var pPass = utf8.encode(pp + pSalt);
-      var pHash = sha256.convert(pPass);
-      pp = pHash.toString();
-
-      for (int i = 0; i < pelist.length; i++) {
-        if (pe == pelist[i] && pp == pplist[i]) {
-          print("Valid Parent Email and Password");
-          loggedIn = true;
-          MyApp.email = pe;
-          notLoading();
-          Navigator.push(context,
-            MaterialPageRoute(
-              builder: (context) => MyHomePage(title: 'Shape matching game')),);
-          return;
-        }
-        else {
-          print("Invalid Parent Email and/or Password");
-          notLoading();
-        }
-      }
-    });
+            for (int i = 0; i < pelist.length; i++) {
+              if (pe == pelist[i] && pp == pplist[i]) {
+                print("Valid Parent Email and Password");
+                loggedIn = true;
+                MyApp.email = pe;
+                notLoading();
+                Navigator.push(context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MyHomePage(title: 'Shape matching game')),);
+                return;
+              }
+              else {
+                print("Invalid Parent Email and/or Password");
+                notLoading();
+              }
+            }
+          }
+          else
+            return;
+        });
   }
 
   void checkTeacherLogin(List<Teachers> teacherJsonData, String te, String tp) {
@@ -296,39 +286,34 @@ class LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixi
       tplist.add(teacherJsonData[i].password);
     }
 
+        Future <String> ts = checkTS(te,teacherJsonData);
+        ts.then((String tSalt) {
+          if(tSalt != "") {
+            //encode,hash,and salt pass for comparison
+            var tPass = utf8.encode(tp + tSalt);
+            var tHash = sha256.convert(tPass);
+            tp = tHash.toString();
 
-    //stop checking if email isn't a teacher email
-    for(int i = 0; i < tot_par; i++) {
-      if(te != teacherJsonData[i].email) {
-        return;
-      }
-    }
-
-    Future <String> ts = checkTS(te);
-    ts.then((String tSalt) {
-
-      //encode,hash,and salt pass for comparison
-      var tPass = utf8.encode(tp + tSalt);
-      var tHash = sha256.convert(tPass);
-      tp = tHash.toString();
-
-      for (int i = 0; i < telist.length; i++) {
-        if (te == telist[i] && tp == tplist[i]) {
-          print("Valid Teacher Email and Password");
-          loggedIn = true;
-          MyApp.email = te;
-          notLoading();
-          Navigator.push(context,
-            MaterialPageRoute(builder: (context) =>
-                MyHomePage(title: 'Shape matching game')),);
-          return;
-        }
-        else {
-          print("Invalid Teacher Email and/or Password");
-          notLoading();
-        }
-      }
-    });
+            for (int i = 0; i < telist.length; i++) {
+              if (te == telist[i] && tp == tplist[i]) {
+                print("Valid Teacher Email and Password");
+                loggedIn = true;
+                MyApp.email = te;
+                notLoading();
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context) =>
+                      MyHomePage(title: 'Shape matching game')),);
+                return;
+              }
+              else {
+                print("Invalid Teacher Email and/or Password");
+                notLoading();
+              }
+            }
+          }
+          else
+            return;
+        });
   }
 
   loading() {

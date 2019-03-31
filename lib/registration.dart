@@ -45,7 +45,8 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
       'password' : upass,
       'uname': uname,
       'salt': "",
-      'Parent_id':""
+      'Parent_id':"",
+      "pD":""
     };
 
     Map<String,dynamic> teacherJsonMap = {
@@ -55,7 +56,8 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
       'class_num' : uclass,
       'age_group' : uagegroup,
       'salt': "",
-      'Teacher_id': ""
+      'Teacher_id': "",
+      "tD":""
     };
 
     Map<String,dynamic> playerJsonMap = {
@@ -163,7 +165,7 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
           //put parent id in DB for ref to salt
           dec["Parent_id"] = pid;
           pidSalt = json.encode(dec);
-          print(pidSalt);
+          //print(pidSalt);
 
           //store salt associated with registered parent using POST
           http.post('https://braintrainapi.com/btapi/parents',
@@ -261,7 +263,7 @@ class RegistrationPageState extends State<RegistrationPage> with SingleTickerPro
               .then((response) {
             print("Storing of salt w/ TID complete");
             //print("Response status: ${response.statusCode}");
-            print("Response body: ${response.body}");
+            //print("Response body: ${response.body}");
           });
           return;
         }
