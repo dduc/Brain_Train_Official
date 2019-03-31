@@ -117,6 +117,12 @@ class _BalloonGameState extends State<balloongame> with TickerProviderStateMixin
   //build for game. updated when "set state {}" is called.
   @override
   Widget build(BuildContext context) {
+    //force portrait mode
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+
+    ]);
 
     //variables for screen width and height
     double screenWidth = MediaQuery.of(context).size.width;
