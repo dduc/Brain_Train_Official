@@ -187,6 +187,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             },),
         ),
         new Positioned(
+          top: screenHeight/1.15 - 150/2,
+          left: screenWidth/1.9,
+          width: 150,
+          height: 150,
+          child: FlatButton(
+            child: Image.asset("assets/jar_game_icon.png"),
+            onPressed: () {
+              Navigator.push(context,
+                MaterialPageRoute(builder: (context) => marbles()),);
+            },),
+        ),
+        new Positioned(
           top: screenHeight/1.5 - 150/2,
           left: screenWidth/12,
           child: FlatButton(

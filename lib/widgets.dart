@@ -182,6 +182,13 @@ class _DraggableWidgetState extends State<DraggableWidget> with TickerProviderSt
   //things that are built in game. updated when set state {} is called.
   @override
   Widget build(BuildContext context) {
+    //force portrait mode
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+
+    ]);
+
     //stop any sound from sound manager if there is something playing
     soundManager.stop();
 
