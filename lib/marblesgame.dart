@@ -24,8 +24,8 @@ class marbles extends StatelessWidget {
     List<double> marbleYPos = new List(9);
 
     for(int i = 0; i < 9; i++) {
-      marbleXPos[i] = 25.0 * i + 85;
-      marbleYPos[i] = 25.0 * (i % 3) + 500;
+      marbleXPos[i] = screenWidth/20 * i + screenWidth/4.5;
+      marbleYPos[i] = screenHeight/20 * (i % 3) + screenHeight/1.35;
     }
 
     return Scaffold(
@@ -170,7 +170,7 @@ class _MarblesGameState extends State<marblesgame> with TickerProviderStateMixin
                 setState(() {
                   if(data <=5 ) {
                     widget.marblesOffset[data] =
-                        Offset(screenWidth/4 + 25*data, screenHeight / 1.7);
+                        Offset(screenWidth/3.7 + 25*data, screenHeight / 1.7);
                   }
                   else {
                     widget.marblesOffset[data] =
