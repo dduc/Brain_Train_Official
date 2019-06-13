@@ -7,9 +7,9 @@ the Flutter framework which compiles to work for both iOS and Android devices.
 Our development team consists of four developers. We have been working on this
 project for over a year and we are currently still in development.
 Our team members and responsibilities include:
-Kasean - Team Lead/Frontend Design/Website
-Eduardo - Game Design
-Matt - Game Design
+Kasean - Team Lead/Frontend Design/Website |
+Eduardo - Game Design |
+Matt - Game Design |
 Dirk - Frontend/Backend Database
 
 # About this GitHub
