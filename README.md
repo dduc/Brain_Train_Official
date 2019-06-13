@@ -5,7 +5,7 @@ the Flutter framework which compiles to work for both iOS and Android devices.
 
 # The Team
 Our development team consists of four developers. We have been working on this
-project for over a year and our continuing to develop our project.
+project for over a year and we are currently still in develoment.
 Our team members and responsibilities include:
 Kasean - Team Lead/Frontent Design/Website
 Eduardo - Game Design
