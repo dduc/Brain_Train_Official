@@ -1,11 +1,13 @@
 # About the App
-The official GitHub of an educational mobile app for young children
+The official public-facing GitHub of an educational mobile app for young children
 from the ages of three to five, called "Brain Train". Developed using 
 the Flutter framework which compiles to work for both iOS and Android devices.
 
 # The Team
 Our development team consists of four developers. We have been working on this
-project for over a year and we are currently still in development.
+project for over a year and we are currently still in development. There is no
+current time for release, although this page will be updated for when the the full
+release is set in stone.
 Our team members and responsibilities include:
 Kasean - Team Lead/Frontend Design/Website |
 Eduardo - Game Design |
