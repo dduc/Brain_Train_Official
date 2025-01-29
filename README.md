@@ -4,11 +4,12 @@ from the ages of three to five, called "Brain Train". Developed using
 the Flutter framework which compiles to work for both iOS and Android devices.
 
 # The Team
-Our development team consists of four developers. We have been working on this
-project for over a year and we are currently still in development. There is no
-current time for release, although this page will be updated for when the the full
-release is set in stone.
-Our team members and responsibilities include:
+At the moment, this project is on hold until further notice. 
+The current state of the project was developed by four developers who created
+this for a senior project. This software may be further developed in the future. 
+Any further updates will be published here.
+
+Here are the founding team members and their contributions:
 Kasean - Team Lead/Frontend Design/Website |
 Eduardo - Game Design |
 Matt - Game Design |
